@@ -9,6 +9,11 @@ namespace {
 	std::unordered_map<std::string, scene> scenes;
 }
 
+std::unordered_map<std::string, scene>& get_scenes()
+{
+	return scenes;
+}
+
 void scene::draw(programs::program* prog, glm::mat4 global_model)
 {
 	unsigned int i = 0;
@@ -19,17 +24,15 @@ void scene::draw(programs::program* prog, glm::mat4 global_model)
 	}
 }
 
-void create_scene(std::string path, bool uv_flipped)
+void create_scene(const std::string& scene_name, std::string path, bool uv_flipped)
 {
-	utl::normalize_path(path);
 	if ( scenes.find(path) != scenes.end() )
 		return;
-	scenes[path] = create_scene_from_file(path, uv_flipped);		
+	scenes[scene_name] = create_scene_from_file(path, uv_flipped);		
 }
 
 scene* get_scene(std::string path)
 {
-	utl::normalize_path(path);
 	return &scenes[path];
 }
 

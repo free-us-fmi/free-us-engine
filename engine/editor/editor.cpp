@@ -4,8 +4,15 @@
 
 #include "scene_view.h"
 #include "ECS/components/selected_entity_view.h"
+#include "content/model_view.h"
 
 #include "ECS/entity_view.h"
+#include "core/GLCommon.h"
+
+#include "files/file_browser.h"
+#include "assets/AssetsPath.h"
+#include "managers/TextureManager.h"
+#include "utility/EditorPath.h"
 
 namespace editor 
 {
@@ -31,8 +38,11 @@ void initialize(const editor_init_data& data)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	scene::initialize(data._scene_view_data);
+	textures::add_texture(editor::GetEditorPath() + "assets/folder.png");	
+	textures::add_texture(editor::GetEditorPath() + "assets/file.png");	
 
+	scene::initialize(data._scene_view_data);
+	selected_entity::initialize(data.program);
 }
 
 void start_frame()
@@ -42,6 +52,7 @@ void start_frame()
         ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport();
 
+	glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 	scene::clear();
 }
 
@@ -50,6 +61,7 @@ void update()
 	scene::update();
 	entity::update();
 	selected_entity::update();
+	model::update();
 }
 
 void draw()

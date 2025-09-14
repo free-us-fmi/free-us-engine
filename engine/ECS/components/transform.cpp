@@ -51,6 +51,8 @@ transform::transform(entity::entity_id entity)
 	_position = glm::mat4(1.f);
 	_rotation = glm::mat4(1.f);
 	_scale = glm::mat4(1.f);
+
+	update_model();
 }
 
 void transform::set_position(const glm::vec3& position)

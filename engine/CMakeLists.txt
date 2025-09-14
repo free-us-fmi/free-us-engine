@@ -30,6 +30,13 @@ add_executable(engine main.cpp ../glad/src/glad.c
 		editor/ECS/entity_view.cpp
 		editor/ECS/components/selected_entity_view.cpp
 		editor/ECS/components/transform_view.cpp
+		editor/utility/EditorPath.cpp
+		editor/utility/helpers/draw_browser.cpp
+		editor/files/file_popup.cpp
+		editor/files/file_browser.cpp
+		editor/content/model_pupup.cpp
+		editor/content/model_browser.cpp
+		editor/content/model_view.cpp
 
 		data/Framebuffer.cpp
 

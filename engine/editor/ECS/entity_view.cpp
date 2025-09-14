@@ -29,6 +29,11 @@ void update()
 		ImGui::Text("%s", entity.get_name().c_str());
 	}
 
+	if ( ImGui::Button("Add entity") )
+	{
+		ecs::create_entity();
+	}
+
 	ImGui::End();
 }
 

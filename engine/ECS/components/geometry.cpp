@@ -12,18 +12,19 @@ namespace {
 	utl::vector<unsigned int> generations;
 }
 
-geometry::geometry(entity::entity_id entity, const std::string& model_path, programs::program* program, bool texture_flipped)
+geometry::geometry(entity::entity_id entity, const std::string& model_name, programs::program_id program_id, bool texture_flipped)
 {
 	_entity_id = entity;
-	_program = program;
-	path = model_path;
-	content::scene::create_scene(path, texture_flipped);
+	_program_id = program_id;
+	_name = model_name;
+	if ( !content::scene::get_scene(model_name) ) 
+		spdlog::error("Cannot create geometry component! Model with name {0} doesn't exist!", model_name);
 }
 
 void geometry::draw()
 {
 	entity::entity* _entity = ecs::get_entity(_entity_id);
-	content::scene::scene* _scene = content::scene::get_scene(path);	
+	content::scene::scene* _scene = content::scene::get_scene(_name);	
 	assert( _entity->_transform != id::invalid_id);
 
 	if ( _entity->_transform == id::invalid_id )
@@ -33,12 +34,13 @@ void geometry::draw()
 	}
 	if ( glm::length(_entity->get_transform()->get_position() - glm::vec3(0.f, 0.f, 0.f)) > 1000)
 		return;
+	programs::program* _program = programs::GetProgram(_program_id);
 	_scene->draw(_program, _entity->get_transform()->get_model());
 }
 
-geometry_id create_geometry(entity::entity_id entity, const std::string& model_path, programs::program* program, bool texture_flipped)
+geometry_id create_geometry(entity::entity_id entity, const std::string& model_name, programs::program_id program_id, bool texture_flipped)
 {
-	unsigned int index = components.emplace_tombstone(entity, model_path, program, texture_flipped);
+	unsigned int index = components.emplace_tombstone(entity, model_name, program_id, texture_flipped);
 	if ( index >= generations.size() )
 		generations.emplace_back(0);
 	

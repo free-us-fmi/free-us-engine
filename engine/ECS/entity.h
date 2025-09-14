@@ -26,7 +26,7 @@ public:
 	components::point_light::point_light* get_point_light();
 	components::geometry::geometry* get_geometry();
 	
-	void create_geometry(const std::string& model_path, programs::program* program, bool texture_flipped = false);
+	void create_geometry(const std::string& model_path, programs::program_id program_id, bool texture_flipped = false);
 	void create_transform();
 	void create_point_light(); 
 

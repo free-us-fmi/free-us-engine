@@ -58,15 +58,10 @@ bool application::Initialize()
 	glfwSwapInterval(0);
 	int version = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	
-	editor::editor_init_data editor_descriptor;
-	editor_descriptor._window = _window;
-	editor_descriptor._scene_view_data._frame_buffer_height = 1080;
-	editor_descriptor._scene_view_data._frame_buffer_width = 1920;
 
-	editor::initialize(editor_descriptor);
 	
-	unsigned int prog = programs::AddProgram();
-        _program = programs::GetProgram(prog);
+	 prog = programs::AddProgram();
+	programs::program* _program = programs::GetProgram(prog);
 
         _program->AddShader(programs::program::VERTEX,
                             shaders::GetShadersPath() + "vertex.glsl");
@@ -77,24 +72,28 @@ bool application::Initialize()
 	_scene = assets::GetAssetsPath() + "resources/objects/rock/rock.obj";
 	_scene2 = assets::GetAssetsPath() + "resources/objects/cro/cro.glb";
 
-	
+	content::scene::create_scene("croissant", _scene2);	
 
 	glEnable(GL_DEPTH_TEST);
+	editor::editor_init_data editor_descriptor;
+	editor_descriptor._window = _window;
+	editor_descriptor._scene_view_data._frame_buffer_height = 1080;
+	editor_descriptor._scene_view_data._frame_buffer_width = 1920;
+	editor_descriptor.program = prog;
 
+	editor::initialize(editor_descriptor);
 	camera::Initialize(_window);
 	
 		
 
 	for ( unsigned int i = 0; i < 9; ++i )
 	{
-		std::cout << "debug start" << std::endl;
 		entt.emplace_back(ecs::create_entity("croissant_" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
-		_entity->create_geometry(_scene2, _program);
+		_entity->create_geometry("croissant", prog);
 		_entity->get_transform()->set_position(glm::vec3((i % 3) * 4, 0.f, i / 3 * 4));
 		_entity->get_transform()->set_scale(glm::vec3(0.1f, 0.1f, 0.1f));
 		_entity->get_transform()->set_rotation(glm::vec3(-90.f, 0.f, 180.f));
-		std::cout << "debug stop" << std::endl;
 	}
 
 
@@ -108,11 +107,13 @@ bool application::Initialize()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+
 	return true;
 }
 
 void application::Run()
 {
+	programs::program* _program = programs::GetProgram(prog);
 	if ( glfwWindowShouldClose(_window))
 		_finished = true;
 	
@@ -148,6 +149,7 @@ void application::Run()
 
 void application::Finalize()
 { 
+	programs::program* _program = programs::GetProgram(prog);
 	glDeleteProgram(_program->GetId());
 	glfwTerminate();
 }

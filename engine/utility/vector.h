@@ -408,12 +408,14 @@ public:
 		*(_is_tombstone + _first_tombstone) = true;	
 		++_tombstones;
 	}
+
 private:
 	T* _data = nullptr;
 	unsigned int _size = 0;
 	unsigned int _capacity = 0;
 
 	bool* _is_tombstone = nullptr;
+	//TODO use a queue
 	int _first_tombstone = -1;
 	unsigned int _tombstones = 0;
 };

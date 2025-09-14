@@ -23,7 +23,7 @@ private:
 	std::string _texture_fbo = "*fbo_texture";
 
 
-	programs::program* _program;
+	programs::program_id prog;
 
 	unsigned int _FBO;
 	unsigned int _RBO;

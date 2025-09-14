@@ -15,6 +15,9 @@ namespace  {
 }
 void add_texture(std::string path)
 {
+	if ( textures.find(path) != textures.end() )
+		return;
+
 	if ( path[0] != '*' )
 		utl::normalize_path(path);
 	

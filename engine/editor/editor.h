@@ -9,6 +9,7 @@ struct editor_init_data
 {
 	GLFWwindow* _window;
 	scene::editor_init_data _scene_view_data;
+	programs::program_id program;
 };
 
 void initialize(const editor_init_data& data);

@@ -3,7 +3,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <unordered_map>
-
+#include "imgui/backends/imgui_impl_glfw.h"
 namespace camera
 {
 GLFWwindow* window;
@@ -16,6 +16,7 @@ std::unordered_map<int, bool> key_map;
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 	if ( action == GLFW_PRESS )
 		key_map[key] = true;
 	else if ( action == GLFW_RELEASE )
