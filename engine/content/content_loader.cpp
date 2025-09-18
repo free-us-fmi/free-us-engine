@@ -9,6 +9,7 @@
 #include "utility/assimp_glm.h"
 #include <filesystem>
 #include <fstream>
+
 namespace content
 {
 
@@ -25,7 +26,6 @@ void create_scene(aiNode* node, utl::vector<unsigned int>& mesh_ids, scene::scen
 		_model._local_model = AssimpGLMHelpers::ConvertMatrixToGLMFormat(node->mTransformation);
 		unsigned int id = model::add_model(_model);
 		scene_data._models.emplace_back(id);
-		std::cout << "created model with id " << id << " and no of meshes: " << _model._meshes.size() << std::endl;
 	}
 
 	for ( unsigned int i = 0; i < node->mNumChildren; ++i )
@@ -67,9 +67,6 @@ utl::vector<std::string> create_and_reister_texture_type(aiMaterial* material, a
 			utl::normalize_path(path);
 		}
 
-
-		std::cout << "texture path: " << path << std::endl;
-
 		std::string _extension = std::filesystem::path(path).extension();
 
 		GLenum format;
@@ -92,7 +89,6 @@ mesh::material create_and_register_material(aiMaterial* material,const std::stri
 unsigned int create_and_register_mesh(aiMesh* mesh,utl::vector<mesh::material>& materials)
 {
 	mesh::mesh mesh_data;
-	std::cout << "started creating mesh " << std::endl;	
 	for ( unsigned int i = 0; i < mesh->mNumVertices; ++i )
 	{
       		vertex vertex_data;
@@ -112,7 +108,6 @@ unsigned int create_and_register_mesh(aiMesh* mesh,utl::vector<mesh::material>& 
 		mesh_data._vertices.emplace_back(vertex_data);
 	}
 
-	std::cout << "created mesh" << std::endl;
 	for ( unsigned int i = 0; i < mesh->mNumFaces; ++i )
 	{
 		aiFace face = mesh->mFaces[i];
@@ -126,13 +121,12 @@ unsigned int create_and_register_mesh(aiMesh* mesh,utl::vector<mesh::material>& 
 	mesh_data._material = materials[mesh->mMaterialIndex];
 	
 	unsigned int id = mesh::add_mesh(mesh_data);
+	std::cout << "debug " << id << std::endl;
 	return id;
 }
 
 scene::scene create_scene_from_file(std::string path, bool uv_flipped)
 {
-
-	std::cout << "DEBUG loading scene" << std::endl;
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path.c_str(),aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_ValidateDataStructure | (aiProcess_FlipUVs * uv_flipped));
 	
@@ -148,10 +142,8 @@ scene::scene create_scene_from_file(std::string path, bool uv_flipped)
 	for ( unsigned int i = 0; i < scene->mNumMeshes; ++i )
 		mesh_ids.emplace_back(create_and_register_mesh(scene->mMeshes[i], materials));
 
-	std::cout << "got here" << std::endl;
 	scene::scene scene_data;
 	create_scene(scene->mRootNode, mesh_ids, scene_data);
-	std::cout << "DREW SCENE" << std::endl;
 	return scene_data;
 }	
 

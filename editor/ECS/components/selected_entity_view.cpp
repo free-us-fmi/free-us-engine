@@ -41,6 +41,8 @@ void update()
 	{
 		ImGui::SetNextWindowSize(ImVec2(256, 256));
 		ImGui::OpenPopup("Add component");
+		
+		model_browser::popup::initialize();	
 		model_path = "";
 	}
 	
@@ -51,15 +53,14 @@ void update()
 		if ( ImGui::Button("geometry"))
 		{
 			ImGui::SetNextWindowSize(ImVec2(512, 512));
-			model_browser::popup::initialize();		
 			model_popup = true;
+			model_browser::popup::open();
 		}
 		if ( model_popup)
 			model_browser::popup::update();
 		model_path = model_browser::popup::result();
 		if ( model_path != "" )
 		{
-			std::cout << "debug " << model_path << std::endl;
 			ImGui::CloseCurrentPopup();
 			_entity->create_geometry(model_path, program_id);
 		}

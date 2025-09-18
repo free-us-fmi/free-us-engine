@@ -3,11 +3,11 @@
 #include <memory>
 #include <thread>
 #include <iostream>
-
+#include "editor.h"
 
 int main() {
   
-
+	
 	std::unique_ptr<application> _application;
 	_application = std::make_unique<application>();
 
@@ -17,6 +17,14 @@ int main() {
 		return 0;
 	}
 
+	editor::editor_init_data editor_descriptor;
+	editor_descriptor._window = _application->get_window();
+	editor_descriptor._scene_view_data._frame_buffer_height = 1080;
+	editor_descriptor._scene_view_data._frame_buffer_width = 1920;
+	editor_descriptor.program = _application->get_program();
+	editor::initialize(editor_descriptor);
+	_application->set_fbo(editor::scene::get_framebuffer());
+
 	const double FPS = 120000.0;
 	double frame_duration = 1. / FPS;
 
@@ -25,6 +33,7 @@ int main() {
 
 	while ( ! _application->IsFinished() )
 	{	
+		editor::start_frame();
 		double frame_start = glfwGetTime();
 		_application->Run();
 		double frame_end = glfwGetTime();
@@ -39,6 +48,8 @@ int main() {
                   frame_count = 0;
                   counter_start = frame_end;
                 }
+		editor::update();
+		editor::draw();
         }
 
 	_application->Finalize();

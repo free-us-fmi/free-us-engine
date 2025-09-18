@@ -6,6 +6,9 @@
 #include "assets/AssetsPath.h"
 #include <filesystem>
 #include "utility/path.h"
+#include "thread/main_thread_dispatcher.h"
+
+
 namespace textures 
 {
 
@@ -88,39 +91,47 @@ utl::vector<unsigned int> set_texture_list(utl::vector<std::string> list)
 
 void texture_2d::initialize(std::string path)
 {
-	glGenTextures(1, &_id);
+	auto gl_call = [&](){
+		glGenTextures(1, &_id);
 
-	if ( path[0] == '*' )
-		return;
+		if ( path[0] == '*' )
+			return;
 
-	stbi_set_flip_vertically_on_load(true);
-	int width, height, channels;
+		stbi_set_flip_vertically_on_load(true);
+		int width, height, channels;
 
-	utl::normalize_path(path);	
+		utl::normalize_path(path);	
 
-	_path = path;
+		_path = path;
 
 
-	unsigned char* data = stbi_load((path).c_str(), &width, &height, &channels, 0);
+		unsigned char* data = stbi_load((path).c_str(), &width, &height, &channels, 0);
+		
+		assert(data != nullptr);
+		if ( data == nullptr ){
+			spdlog::error( "Error! Failed to create texture with path: {0}", path);
+			glDeleteTextures(1, &_id);
+			return;
+		}
+
+		GLenum format, internal_format;
+		glBindTexture(GL_TEXTURE_2D, _id);
+		if ( channels == 4 )
+			format = internal_format = GL_RGBA;
+		else if ( channels == 3) 
+			format = internal_format = GL_RGB;
+		else format = internal_format = GL_ALPHA;
+
+		glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		stbi_image_free(data);
+	};
 	
-	assert(data != nullptr);
-	if ( data == nullptr ){
-		spdlog::error( "Error! Failed to create texture with path: {0}", path);
-		glDeleteTextures(1, &_id);
-		return;
-	}
+	std::mutex wait_for_main;
+	wait_for_main.lock();
+	thread::main_thread::add_event(gl_call, wait_for_main, std::this_thread::get_id());
+	std::lock_guard<std::mutex> lg(wait_for_main);
 
-	GLenum format, internal_format;
-	glBindTexture(GL_TEXTURE_2D, _id);
-	if ( channels == 4 )
-		format = internal_format = GL_RGBA;
-	else if ( channels == 3) 
-		format = internal_format = GL_RGB;
-	else format = internal_format = GL_ALPHA;
-
-	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(data);
 }
 
 void texture_2d::bind(unsigned int slot)

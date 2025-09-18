@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(assimp)
 add_subdirectory(spdlog)
 add_subdirectory(imgui)
+add_subdirectory(editor)
 add_subdirectory(engine)
 add_subdirectory(glfw)
 

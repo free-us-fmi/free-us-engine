@@ -57,7 +57,7 @@ void Initialize(GLFWwindow* win)
 	view_matrix = glm::mat4(1.f);
 }
 
-double camera_speed = 2;
+double camera_speed = 10;
 
 
 glm::vec3 forward = glm::vec4(0.f, 0.f, -1.f, 1.f);

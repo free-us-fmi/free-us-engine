@@ -12,8 +12,7 @@
 
 #include "glm/gtc/type_ptr.hpp"
 #include "content/scene.h"
-
-#include "editor/editor.h"
+#include "thread/main_thread_dispatcher.h"
 #include "utility/util.h"
 
 void error_callback(int error, const char* description)
@@ -32,7 +31,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 bool application::Initialize()
 {
-
+	thread::main_thread::initialize();
 	spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
 
 	if ( ! glfwInit() )
@@ -73,26 +72,15 @@ bool application::Initialize()
 	_scene2 = assets::GetAssetsPath() + "resources/objects/cro/cro.glb";
 
 	content::scene::create_scene("croissant", _scene2);	
-
-	glEnable(GL_DEPTH_TEST);
-	editor::editor_init_data editor_descriptor;
-	editor_descriptor._window = _window;
-	editor_descriptor._scene_view_data._frame_buffer_height = 1080;
-	editor_descriptor._scene_view_data._frame_buffer_width = 1920;
-	editor_descriptor.program = prog;
-
-	editor::initialize(editor_descriptor);
-	camera::Initialize(_window);
 	
-		
+	glEnable(GL_DEPTH_TEST);
 
 	for ( unsigned int i = 0; i < 9; ++i )
 	{
 		entt.emplace_back(ecs::create_entity("croissant_" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
 		_entity->create_geometry("croissant", prog);
-		_entity->get_transform()->set_position(glm::vec3((i % 3) * 4, 0.f, i / 3 * 4));
-		_entity->get_transform()->set_scale(glm::vec3(0.1f, 0.1f, 0.1f));
+		_entity->get_transform()->set_position(glm::vec3((i % 3) * 35, 0.f, i / 3 * 35));
 		_entity->get_transform()->set_rotation(glm::vec3(-90.f, 0.f, 180.f));
 	}
 
@@ -110,14 +98,20 @@ bool application::Initialize()
 
 	return true;
 }
-
+bool first_time = true;
 void application::Run()
 {
+	if ( first_time )
+	{
+		first_time = false;
+		camera::Initialize(_window);
+	}
+	
+	thread::main_thread::update();
 	programs::program* _program = programs::GetProgram(prog);
 	if ( glfwWindowShouldClose(_window))
 		_finished = true;
 	
-	editor::start_frame();
 
 	_program->Bind();
 
@@ -134,12 +128,11 @@ void application::Run()
 	camera::Update();
 	_program->SetUniform3fv("eyePos", glm::value_ptr(camera::GetCameraPos()));
 	
-	editor::scene::bind_framebuffer();
+	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
 
 	ecs::update();
 
-	editor::update();
-	editor::draw();
+
 
 	glfwSwapBuffers(_window);
 	glfwPollEvents();

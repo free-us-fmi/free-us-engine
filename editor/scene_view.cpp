@@ -3,6 +3,7 @@
 #include "data/Framebuffer.h"
 #include "utility/util.h"
 #include "editor_common.h"
+
 namespace editor::scene 
 {
 
@@ -23,6 +24,11 @@ void initialize(const editor_init_data& data)
 void bind_framebuffer()
 {
 	data::framebuffer::BindFramebuffer(_framebuffer_id);
+}
+
+unsigned int get_framebuffer()
+{
+	return data::framebuffer::GetFramebuffer(_framebuffer_id)->get_id();	
 }
 
 void clear()

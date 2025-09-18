@@ -20,10 +20,13 @@ namespace {
 
 void initialize()
 {
-	if ( initialized )
-		spdlog::error("Warning! model browser popup can only be used once at a time!");	initialized = true;
+	initialized = true;
 	selected_model = "";
 	browser.initialize();
+}
+
+void open()
+{
 	ImGui::SetNextWindowSize(ImVec2(512, 512));
 	ImGui::OpenPopup("select model");
 }

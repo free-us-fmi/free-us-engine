@@ -16,7 +16,10 @@ public:
 	void Finalize();
 
 	bool IsFinished() const { return _finished; }
-
+	
+	void set_fbo(unsigned int fbo) { _FBO = fbo;}
+	GLFWwindow* get_window() const { return _window; }
+	programs::program_id get_program() const { return prog; }
 private:
 	std::string _texture;
 	std::string _texture_specular;
@@ -26,7 +29,6 @@ private:
 	programs::program_id prog;
 
 	unsigned int _FBO;
-	unsigned int _RBO;
 	GLFWwindow* _window;
 
 	bool _finished = false;

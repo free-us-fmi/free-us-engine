@@ -30,6 +30,11 @@ void initialize(const std::string& root_path, bool allow_root)
 	
 	initialized = true;
 	
+
+}
+
+void open() 
+{
 	ImGui::SetNextWindowSize(ImVec2(512, 512));
 	ImGui::OpenPopup("select file");
 }

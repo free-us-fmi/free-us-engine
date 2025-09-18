@@ -1,6 +1,8 @@
 #include "mesh.h"
 #include "core/GLCommon.h"
 #include "managers/TextureManager.h"
+#include "thread/main_thread_dispatcher.h"
+#include <mutex>
 namespace content::mesh 
 {
 
@@ -11,8 +13,6 @@ namespace {
 void mesh::draw(programs::program* prog, glm::mat4 model)
 {
 	glBindVertexArray(_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EBO);
 
 	glm::mat4 normal_model = glm::transpose(glm::inverse(model));
 
@@ -48,31 +48,36 @@ mesh* get_mesh(unsigned int id)
 	return &meshes[id];
 }
 
-unsigned int add_mesh( mesh& m)
+unsigned int add_mesh(mesh& m)
 {
+	auto gl_call = [&](){
+		glGenVertexArrays(1, &m._VAO);
+
+		glGenBuffers(1, &m._VBO);
+		glGenBuffers(1, &m._EBO);
+		
+		glBindVertexArray(m._VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, m._VBO);
+		glBufferData(GL_ARRAY_BUFFER, m._vertices.size() * sizeof(vertex), m._vertices.data(), GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m._EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m._indices.size() * sizeof(u32), m._indices.data(), GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *  sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 *  sizeof(float), (void*)(sizeof(float) * 3));
+		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
+		glEnableVertexAttribArray(2);
+	};
+
+	std::mutex wait_for_main; 
+	thread::main_thread::add_event(gl_call, wait_for_main, std::this_thread::get_id());
 	
+	std::lock_guard<std::mutex> lg(wait_for_main);
 
-	glGenVertexArrays(1, &m._VAO);
-
-	glGenBuffers(1, &m._VBO);
-	glGenBuffers(1, &m._EBO);
-	
-	glBindVertexArray(m._VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m._VBO);
-	glBufferData(GL_ARRAY_BUFFER, m._vertices.size() * sizeof(vertex), m._vertices.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m._EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m._indices.size() * sizeof(u32), m._indices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *  sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 *  sizeof(float), (void*)(sizeof(float) * 3));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
-	glEnableVertexAttribArray(2);
-	
 	unsigned int id = meshes.emplace_tombstone(m);
 	return id;
 }

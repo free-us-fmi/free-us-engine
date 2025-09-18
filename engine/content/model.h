@@ -11,6 +11,7 @@ struct model
 	glm::mat4 _local_model;
 
 	void draw(programs::program* prog, glm::mat4 global);
+
 };
 
 

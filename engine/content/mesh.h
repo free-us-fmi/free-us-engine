@@ -4,6 +4,7 @@
 #include <string>
 #include "content_structures.h"
 #include "shaders/program.h"
+
 namespace content::mesh 
 {
 

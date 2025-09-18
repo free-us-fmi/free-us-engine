@@ -1,6 +1,6 @@
 project(engine)
 
-add_executable(engine main.cpp ../glad/src/glad.c
+add_library(engine STATIC ../glad/src/glad.c
 		shaders/src/ShadersPath.cpp
 		application.cpp
 		shaders/shader.cpp
@@ -25,20 +25,9 @@ add_executable(engine main.cpp ../glad/src/glad.c
 		content/model.cpp 
 		content/scene.cpp 
 
-		editor/editor.cpp
-		editor/scene_view.cpp
-		editor/ECS/entity_view.cpp
-		editor/ECS/components/selected_entity_view.cpp
-		editor/ECS/components/transform_view.cpp
-		editor/utility/EditorPath.cpp
-		editor/utility/helpers/draw_browser.cpp
-		editor/files/file_popup.cpp
-		editor/files/file_browser.cpp
-		editor/content/model_pupup.cpp
-		editor/content/model_browser.cpp
-		editor/content/model_view.cpp
-
 		data/Framebuffer.cpp
+
+		thread/main_thread_dispatcher.cpp
 
 )
 
