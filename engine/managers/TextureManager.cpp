@@ -91,22 +91,20 @@ utl::vector<unsigned int> set_texture_list(utl::vector<std::string> list)
 
 void texture_2d::initialize(std::string path)
 {
+	if ( path[0] == '*' )
+		return;
+	stbi_set_flip_vertically_on_load(true);
+	int width, height, channels;
+	utl::normalize_path(path);	
+	_path = path;
+
+
+	unsigned char* data = stbi_load((path).c_str(), &width, &height, &channels, 0);
+
 	auto gl_call = [&](){
+
 		glGenTextures(1, &_id);
-
-		if ( path[0] == '*' )
-			return;
-
-		stbi_set_flip_vertically_on_load(true);
-		int width, height, channels;
-
-		utl::normalize_path(path);	
-
-		_path = path;
-
-
-		unsigned char* data = stbi_load((path).c_str(), &width, &height, &channels, 0);
-		
+				
 		assert(data != nullptr);
 		if ( data == nullptr ){
 			spdlog::error( "Error! Failed to create texture with path: {0}", path);
@@ -124,13 +122,15 @@ void texture_2d::initialize(std::string path)
 
 		glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
 	};
 	
 	std::mutex wait_for_main;
 	wait_for_main.lock();
 	thread::main_thread::add_event(gl_call, wait_for_main, std::this_thread::get_id());
 	std::lock_guard<std::mutex> lg(wait_for_main);
+
+
+	stbi_image_free(data);
 
 }
 

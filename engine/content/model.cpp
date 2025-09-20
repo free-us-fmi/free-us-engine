@@ -33,4 +33,15 @@ void remove_model(unsigned int id)
 	assert( id < models.size() );
 	models.erase(models.begin() + id);
 }
+
+
+void model::instantiate(unsigned int transform_id)
+{
+	for ( auto c : _meshes )
+	{
+		mesh::mesh* _mesh = mesh::get_mesh(c);
+		_mesh->instantiate(transform_id);
+	}
+}
+
 }

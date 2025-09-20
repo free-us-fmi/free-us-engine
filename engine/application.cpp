@@ -71,17 +71,17 @@ bool application::Initialize()
 	_scene = assets::GetAssetsPath() + "resources/objects/rock/rock.obj";
 	_scene2 = assets::GetAssetsPath() + "resources/objects/cro/cro.glb";
 
-	content::scene::create_scene("croissant", _scene2);	
+	content::scene::create_scene("croissant", _scene);	
 	
 	glEnable(GL_DEPTH_TEST);
 
-	for ( unsigned int i = 0; i < 9; ++i )
+	for ( unsigned int i = 0; i < 20000; ++i )
 	{
-		entt.emplace_back(ecs::create_entity("croissant_" + std::to_string(i)));
+		entt.emplace_back(ecs::create_entity("croissant" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
-		_entity->create_geometry("croissant", prog);
-		_entity->get_transform()->set_position(glm::vec3((i % 3) * 35, 0.f, i / 3 * 35));
+		_entity->get_transform()->set_position(glm::vec3((i % 100) * 5, 0.f, i / 100 * 5));
 		_entity->get_transform()->set_rotation(glm::vec3(-90.f, 0.f, 180.f));
+      		content::scene::instantiate("croissant", _entity->get_transform_id());
 	}
 
 
@@ -132,7 +132,7 @@ void application::Run()
 
 	ecs::update();
 
-
+	content::mesh::render_instanced(_program);
 
 	glfwSwapBuffers(_window);
 	glfwPollEvents();

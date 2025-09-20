@@ -2,6 +2,8 @@
 #include "core/GLCommon.h"
 #include "managers/TextureManager.h"
 #include "thread/main_thread_dispatcher.h"
+#include "ECS/components/transform.h"
+
 #include <mutex>
 namespace content::mesh 
 {
@@ -50,18 +52,23 @@ mesh* get_mesh(unsigned int id)
 
 unsigned int add_mesh(mesh& m)
 {
+	void* VBO_data, *EBO_data;
 	auto gl_call = [&](){
 		glGenVertexArrays(1, &m._VAO);
 
+		glGenBuffers(1, &m._transform_buffer);
 		glGenBuffers(1, &m._VBO);
 		glGenBuffers(1, &m._EBO);
 		
 		glBindVertexArray(m._VAO);
+
 		glBindBuffer(GL_ARRAY_BUFFER, m._VBO);
-		glBufferData(GL_ARRAY_BUFFER, m._vertices.size() * sizeof(vertex), m._vertices.data(), GL_STATIC_DRAW);
+		glBufferStorage(GL_ARRAY_BUFFER, m._vertices.size() * sizeof(vertex), 0, GL_MAP_WRITE_BIT);
+		VBO_data = glMapBufferRange(GL_ARRAY_BUFFER, 0, m._vertices.size() * sizeof(vertex), GL_MAP_WRITE_BIT);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m._EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m._indices.size() * sizeof(u32), m._indices.data(), GL_STATIC_DRAW);
+		glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, m._indices.size() * sizeof(unsigned int), 0, GL_MAP_WRITE_BIT);	
+		EBO_data = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, m._indices.size() * sizeof(unsigned int), GL_MAP_WRITE_BIT);
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *  sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
@@ -71,12 +78,43 @@ unsigned int add_mesh(mesh& m)
 
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 		glEnableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m._transform_buffer);
+		glBufferData(GL_ARRAY_BUFFER, 20000 * 16 * sizeof(float), nullptr, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(3);
+		glVertexAttribDivisor(3, 1);
+
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(sizeof(float) * 4));
+		glEnableVertexAttribArray(4);
+		glVertexAttribDivisor(4, 1);
+
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(sizeof(float)  * 8));
+		glEnableVertexAttribArray(5);
+		glVertexAttribDivisor(5, 1);
+
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(sizeof(float) * 12));
+		glEnableVertexAttribArray(6);
+		glVertexAttribDivisor(6, 1);
 	};
 
 	std::mutex wait_for_main; 
 	thread::main_thread::add_event(gl_call, wait_for_main, std::this_thread::get_id());
-	
-	std::lock_guard<std::mutex> lg(wait_for_main);
+	wait_for_main.lock();
+	wait_for_main.unlock();
+
+	memcpy(VBO_data, m._vertices.data(), m._vertices.size() * sizeof(vertex));
+	memcpy(EBO_data, m._indices.data(), m._indices.size() * sizeof(unsigned int));
+
+	auto unmap_buffers = [&](){
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+	};
+
+	thread::main_thread::add_event(unmap_buffers, wait_for_main, std::this_thread::get_id());
+	wait_for_main.lock();
+	wait_for_main.unlock();
 
 	unsigned int id = meshes.emplace_tombstone(m);
 	return id;
@@ -89,6 +127,51 @@ void remove_mesh(unsigned int id)
 	glDeleteBuffers(1, &m._EBO);
 	glDeleteBuffers(1, &m._VBO);
 	meshes.erase(meshes.begin() + id);
+}
+
+void mesh::remove_instance(unsigned int id)
+{
+}
+
+void render_instanced(programs::program* prog)
+{
+	for ( auto mesh : meshes )
+		mesh.draw_instanced(prog);
+}
+
+void mesh::draw_instanced(programs::program* prog)
+{
+	if ( !_transforms.size() )
+		return;
+
+	glBindVertexArray(_VAO);
+	textures::unbind_all();
+
+	std::string _texture_specular = "";
+	std::string _texture = "";
+
+	if ( _material._specular_map.size() )
+	{
+		std::string _texture_specular = _material._specular_map[0];
+		unsigned int tex_specular_slot = textures::bind_texture(_texture_specular);
+		prog->SetUniform1i("material.specular", tex_specular_slot);
+	}
+	if ( _material._textures_map.size())
+	{
+		_texture = _material._textures_map[0];
+		unsigned int tex_slot = textures::bind_texture(_texture);
+		prog->SetUniform1i("material.ambient", tex_slot);
+	}
+	glDrawElementsInstanced(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, NULL, _transforms.size());
+}
+	
+unsigned int mesh::instantiate(unsigned int transform_id)
+{
+	ecs::components::transform::transform* transform = ecs::components::transform::get_transform(transform_id);
+	_transforms.push_back(transform->get_model());
+	glBindBuffer(GL_ARRAY_BUFFER, _transform_buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 16 * sizeof(float) * (_transforms.size() - 1), 16 * sizeof(float), _transforms.end() - 1);
+	return _transforms.size() - 1;
 }
 
 }

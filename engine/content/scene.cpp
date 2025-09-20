@@ -33,7 +33,7 @@ void scene::draw(programs::program* prog, glm::mat4 global_model)
 	}
 }
 
-void create_scene(const std::string scene_name, std::string path, bool uv_flipped)
+void create_scene(const std::string& scene_name, std::string path, bool uv_flipped)
 {
 	std::lock_guard<std::mutex> gl(creation_mutex);
 
@@ -49,10 +49,18 @@ void create_scene(const std::string scene_name, std::string path, bool uv_flippe
 	_creation_started.store(false);
 }
 
-scene* get_scene(std::string path)
+scene* get_scene(const std::string& path)
 {
 	return &scenes[path];
 }
 
+void instantiate(const std::string& path, unsigned int transform_id)
+{
+	for ( auto m : scenes[path]._models )
+	{
+		auto model = model::get_model(m);
+		model->instantiate(transform_id);
+	}
+}
 
 }
