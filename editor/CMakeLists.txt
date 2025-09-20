@@ -21,7 +21,6 @@ add_executable(editor main.cpp
 target_include_directories(editor PUBLIC ../glfw/include/)
 target_include_directories(editor PUBLIC ../glad/include/)
 target_include_directories(editor PUBLIC ../assimp/include/ )
-target_include_directories(editor PUBLIC ../spdlog/include/ )
 target_include_directories(editor PUBLIC ../editor/ )
 target_include_directories(editor PUBLIC ../imgui/ )
 target_include_directories(editor PUBLIC ../ )

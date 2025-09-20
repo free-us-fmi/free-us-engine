@@ -46,7 +46,6 @@ unsigned int bind_texture(std::string path)
 	auto iter = textures.find(path);
 	if ( iter == textures.end() )
 	{
-		spdlog::error( "Error! Texture with path: {0} doesn't exists!", path);
 		return ~(0);
 	}
 
@@ -59,7 +58,6 @@ unsigned int bind_texture(std::string path)
 
 	if ( slot >= 32 )
 	{
-		spdlog::error( " Error! Too many texture binded at once!");
 		return ~(0);
 	}
 	texture->bind(slot);	
@@ -107,7 +105,6 @@ void texture_2d::initialize(std::string path)
 				
 		assert(data != nullptr);
 		if ( data == nullptr ){
-			spdlog::error( "Error! Failed to create texture with path: {0}", path);
 			glDeleteTextures(1, &_id);
 			return;
 		}

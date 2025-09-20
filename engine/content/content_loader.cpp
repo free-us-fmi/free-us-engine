@@ -9,6 +9,7 @@
 #include "utility/assimp_glm.h"
 #include <filesystem>
 #include <fstream>
+#include <format>
 
 namespace content
 {

@@ -20,7 +20,6 @@ void initialize(const std::string& process_name)
 {
 	if ( initialized )
 	{
-		spdlog::error("Progress bar popup can only be used once at a time!");
 		return;
 	}
 

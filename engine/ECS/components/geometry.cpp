@@ -17,8 +17,6 @@ geometry::geometry(entity::entity_id entity, const std::string& model_name, prog
 	_entity_id = entity;
 	_program_id = program_id;
 	_name = model_name;
-	if ( !content::scene::get_scene(model_name) ) 
-		spdlog::error("Cannot create geometry component! Model with name {0} doesn't exist!", model_name);
 }
 
 void geometry::draw()
@@ -29,7 +27,6 @@ void geometry::draw()
 
 	if ( _entity->_transform == id::invalid_id )
 	{
-		spdlog::error("Entity with geometry component must also have a transform component!");
 		return;
 	}
 	if ( glm::length(_entity->get_transform()->get_position() - glm::vec3(0.f, 0.f, 0.f)) > 1000)

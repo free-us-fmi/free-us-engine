@@ -15,7 +15,6 @@ void framebuffer::add_renderbuffer(const std::string& name, GLenum format, GLenu
 {
 	if ( _render_buffers.find(name) != _render_buffers.end() )
 	{
-		spdlog::error("Renderbuffer with name {0} already exists!", name);
 		return;
 	}
 	
@@ -51,7 +50,6 @@ void framebuffer::add_texture_2d(const std::string& name, GLenum format, GLenum 
 {
 	if ( _textures_2d.find(name) != _textures_2d.end() )
 	{
-		spdlog::error( "Framebuffer texture with name {0} already exists!", name);
 		return;
 	}
 
@@ -93,7 +91,6 @@ unsigned int framebuffer::get_texture_2d(const std::string& name)
 {
 	if ( _textures_2d.find(name) == _textures_2d.end() )
 	{
-		spdlog::error( "Framebuffer texture with name {0} doesn't exists!", name);
 		return 0;
 	}
 
@@ -104,7 +101,6 @@ unsigned int framebuffer::get_renderbuffer(const std::string& name)
 {
 	if ( _render_buffers.find(name) == _render_buffers.end() )
 	{
-		spdlog::error( "Framebuffer renderbuffer with name {0} doesn't exists!", name);
 		return 0;
 	}
 
@@ -116,7 +112,6 @@ void framebuffer::bind_texture(const std::string& name)
 {
 	if ( _textures_2d.find(name) == _textures_2d.end() )
 	{
-		spdlog::error( "Framebuffer texture with name {0} doesn't exists!", name);
 		return;
 	}
 

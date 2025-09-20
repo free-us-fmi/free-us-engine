@@ -20,9 +20,6 @@ namespace {
 
 void initialize(const std::string& root_path, bool allow_root)
 {
-	if ( initialized )
-		spdlog::error("Warning! filebrowser popup can only be used once at a time!");
-
 	editor_init_data browser_init_data;
 	browser_init_data._name = "select file";
 	browser_init_data._dir_path = root_path;

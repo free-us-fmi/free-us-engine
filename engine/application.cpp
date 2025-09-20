@@ -32,7 +32,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 bool application::Initialize()
 {
 	thread::main_thread::initialize();
-	spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
 
 	if ( ! glfwInit() )
 	{
