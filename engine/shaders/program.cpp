@@ -19,6 +19,7 @@ int program::GetUniformLocation(const std::string& uniform_name)
 
 program::program()
 {
+	_linked = false;
 	_id = glCreateProgram();
 }
 

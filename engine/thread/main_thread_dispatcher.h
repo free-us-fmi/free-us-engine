@@ -2,9 +2,11 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+#include <atomic>
+
 namespace thread::main_thread 
 {
-	void add_event(std::function<void()> event, std::mutex& mt, std::thread::id caller_thread);
+	void add_event_and_wait(std::function<void()> event);
 	void initialize();
 	void update();
 }

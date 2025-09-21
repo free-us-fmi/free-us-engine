@@ -58,14 +58,23 @@ bool application::Initialize()
 	
 
 	
+	instanced_prog = programs::AddProgram();
 	 prog = programs::AddProgram();
+
 	programs::program* _program = programs::GetProgram(prog);
+	programs::program* _instanced_program = programs::GetProgram(instanced_prog);
 
         _program->AddShader(programs::program::VERTEX,
-                            shaders::GetShadersPath() + "vertex.glsl");
+                            shaders::GetShadersPath() + "default.vs");
         _program->AddShader(programs::program::FRAGMENT,
-                            shaders::GetShadersPath() + "fragment.glsl");
+                            shaders::GetShadersPath() + "default.fs");
         _program->Link();
+
+        _instanced_program->AddShader(programs::program::VERTEX,
+                            shaders::GetShadersPath() + "instanced.vs");
+        _instanced_program->AddShader(programs::program::FRAGMENT,
+                            shaders::GetShadersPath() + "default.fs");
+        _instanced_program->Link();
 
 	_scene = assets::GetAssetsPath() + "resources/objects/rock/rock.obj";
 	_scene2 = assets::GetAssetsPath() + "resources/objects/cro/cro.glb";
@@ -74,21 +83,24 @@ bool application::Initialize()
 	
 	glEnable(GL_DEPTH_TEST);
 
-	for ( unsigned int i = 0; i < 20000; ++i )
+	for ( unsigned int i = 0; i < 40000; ++i )
 	{
 		entt.emplace_back(ecs::create_entity("croissant" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
-		_entity->get_transform()->set_position(glm::vec3((i % 100) * 5, 0.f, i / 100 * 5));
+		_entity->get_transform()->set_position(glm::vec3((i % 200) * 5, 0.f, (i / 200) * 5));
 		_entity->get_transform()->set_rotation(glm::vec3(-90.f, 0.f, 180.f));
       		content::scene::instantiate("croissant", _entity->get_transform_id());
 	}
-
-
 
 	_program->SetUniform3fv("dirLight.direction", glm::value_ptr(glm::vec3(-0.5f, -1.f, 0.3f)));
 	_program->SetUniform3fv("dirLight.ambient", glm::value_ptr(glm::vec3(0.23f, 0.23f, 0.23f)));
 	_program->SetUniform3fv("dirLight.diffuse", glm::value_ptr(glm::vec3(1.f, 1.f, 1.f)));
 	_program->SetUniform3fv("dirLight.specular", glm::value_ptr(glm::vec3(1.f, 1.f, 1.f)));
+
+	_instanced_program->SetUniform3fv("dirLight.direction", glm::value_ptr(glm::vec3(-0.5f, -1.f, 0.3f)));
+	_instanced_program->SetUniform3fv("dirLight.ambient", glm::value_ptr(glm::vec3(0.23f, 0.23f, 0.23f)));
+	_instanced_program->SetUniform3fv("dirLight.diffuse", glm::value_ptr(glm::vec3(1.f, 1.f, 1.f)));
+	_instanced_program->SetUniform3fv("dirLight.specular", glm::value_ptr(glm::vec3(1.f, 1.f, 1.f)));
 
 
 	glEnable(GL_CULL_FACE);
@@ -108,6 +120,7 @@ void application::Run()
 	
 	thread::main_thread::update();
 	programs::program* _program = programs::GetProgram(prog);
+	programs::program* _instanced_program = programs::GetProgram(instanced_prog);
 	if ( glfwWindowShouldClose(_window))
 		_finished = true;
 	
@@ -119,19 +132,25 @@ void application::Run()
 
 	glm::mat4 view = glm::mat4(1.f);
 	view = camera::GetViewMatrix();
-	_program->SetUniformMatrix4fv("projection_view", false, glm::value_ptr(projection * view));
+
+	_instanced_program->SetUniformMatrix4fv("projection_view", false, glm::value_ptr(projection * view));
+	_instanced_program->SetUniform1f("material.diffuse", 1.f);
+	_instanced_program->SetUniform1i("material.shininess", 1024);
+	_instanced_program->SetUniform3fv("eyePos", glm::value_ptr(camera::GetCameraPos()));
 	
 
+	_program->SetUniformMatrix4fv("projection_view", false, glm::value_ptr(projection * view));
 	_program->SetUniform1f("material.diffuse", 1.f);
 	_program->SetUniform1i("material.shininess", 1024);
-	camera::Update();
 	_program->SetUniform3fv("eyePos", glm::value_ptr(camera::GetCameraPos()));
 	
+	camera::Update();
+
 	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
 
 	ecs::update();
 
-	content::mesh::render_instanced(_program);
+	content::mesh::render_instanced(_instanced_program);
 
 	glfwSwapBuffers(_window);
 	glfwPollEvents();

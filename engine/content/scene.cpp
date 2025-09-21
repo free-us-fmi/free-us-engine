@@ -38,7 +38,6 @@ void create_scene(const std::string& scene_name, std::string path, bool uv_flipp
 	std::lock_guard<std::mutex> gl(creation_mutex);
 
 	_creation_started.store(true);
-	_creation_started.notify_all();
 
 	if ( scenes.find(scene_name) != scenes.end() )
 	{
@@ -51,6 +50,7 @@ void create_scene(const std::string& scene_name, std::string path, bool uv_flipp
 
 scene* get_scene(const std::string& path)
 {
+	assert(scenes.find(path) != scenes.end());
 	return &scenes[path];
 }
 

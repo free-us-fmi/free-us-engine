@@ -3,6 +3,7 @@
 #include "utility/vector.h"
 #include "shaders/program.h"
 #include <unordered_map>
+#include <mutex>
 
 namespace content::scene 
 {

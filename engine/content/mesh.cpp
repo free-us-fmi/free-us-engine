@@ -3,13 +3,15 @@
 #include "managers/TextureManager.h"
 #include "thread/main_thread_dispatcher.h"
 #include "ECS/components/transform.h"
-
+#include <atomic>
 #include <mutex>
+
 namespace content::mesh 
 {
 
 namespace {
 	utl::vector<mesh, false> meshes;
+	std::mutex _mutex;
 }
 
 void mesh::draw(programs::program* prog, glm::mat4 model)
@@ -21,9 +23,6 @@ void mesh::draw(programs::program* prog, glm::mat4 model)
 	prog->SetUniformMatrix4fv("model", false, glm::value_ptr(model));
 	prog->SetUniformMatrix4fv("normal_model", false, glm::value_ptr(normal_model));
 
-	std::string _texture_specular = "";
-	std::string _texture = "";
-
 	textures::unbind_all();
 
 	if ( _material._specular_map.size() )
@@ -34,7 +33,7 @@ void mesh::draw(programs::program* prog, glm::mat4 model)
 	}
 	if ( _material._textures_map.size())
 	{
-		_texture = _material._textures_map[0];
+		std::string _texture = _material._textures_map[0];
 		unsigned int tex_slot = textures::bind_texture(_texture);
 		prog->SetUniform1i("material.ambient", tex_slot);
 	}
@@ -44,6 +43,7 @@ void mesh::draw(programs::program* prog, glm::mat4 model)
 
 mesh* get_mesh(unsigned int id)
 {
+	std::lock_guard<std::mutex> lg(_mutex);
 	assert(id < meshes.size());
 	assert(!meshes.is_tombstone(meshes.begin() + id));
 
@@ -99,11 +99,7 @@ unsigned int add_mesh(mesh& m)
 		glVertexAttribDivisor(6, 1);
 	};
 
-	std::mutex wait_for_main; 
-	thread::main_thread::add_event(gl_call, wait_for_main, std::this_thread::get_id());
-	wait_for_main.lock();
-	wait_for_main.unlock();
-
+	thread::main_thread::add_event_and_wait(gl_call);
 	memcpy(VBO_data, m._vertices.data(), m._vertices.size() * sizeof(vertex));
 	memcpy(EBO_data, m._indices.data(), m._indices.size() * sizeof(unsigned int));
 
@@ -112,16 +108,16 @@ unsigned int add_mesh(mesh& m)
 		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 	};
 
-	thread::main_thread::add_event(unmap_buffers, wait_for_main, std::this_thread::get_id());
-	wait_for_main.lock();
-	wait_for_main.unlock();
+	thread::main_thread::add_event_and_wait(unmap_buffers);
 
+	std::lock_guard<std::mutex> lg(_mutex);
 	unsigned int id = meshes.emplace_tombstone(m);
 	return id;
 }
 
 void remove_mesh(unsigned int id)
 {
+	std::lock_guard<std::mutex> lg(_mutex);
 	assert( id < meshes.size() );
 	mesh& m = meshes[id];
 	glDeleteBuffers(1, &m._EBO);
@@ -135,6 +131,7 @@ void mesh::remove_instance(unsigned int id)
 
 void render_instanced(programs::program* prog)
 {
+	std::lock_guard<std::mutex> lg(_mutex);
 	for ( auto mesh : meshes )
 		mesh.draw_instanced(prog);
 }
@@ -143,12 +140,10 @@ void mesh::draw_instanced(programs::program* prog)
 {
 	if ( !_transforms.size() )
 		return;
-
+	
 	glBindVertexArray(_VAO);
+	prog->Bind();
 	textures::unbind_all();
-
-	std::string _texture_specular = "";
-	std::string _texture = "";
 
 	if ( _material._specular_map.size() )
 	{
@@ -158,7 +153,7 @@ void mesh::draw_instanced(programs::program* prog)
 	}
 	if ( _material._textures_map.size())
 	{
-		_texture = _material._textures_map[0];
+		std::string _texture = _material._textures_map[0];
 		unsigned int tex_slot = textures::bind_texture(_texture);
 		prog->SetUniform1i("material.ambient", tex_slot);
 	}

@@ -121,11 +121,7 @@ void texture_2d::initialize(std::string path)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	};
 	
-	std::mutex wait_for_main;
-	wait_for_main.lock();
-	thread::main_thread::add_event(gl_call, wait_for_main, std::this_thread::get_id());
-	std::lock_guard<std::mutex> lg(wait_for_main);
-
+	thread::main_thread::add_event_and_wait(gl_call);
 
 	stbi_image_free(data);
 

@@ -33,8 +33,9 @@ void create_scene(aiNode* node, utl::vector<unsigned int>& mesh_ids, scene::scen
 		create_scene(node->mChildren[i], mesh_ids, scene_data);
 }
 
-utl::vector<std::string> create_and_reister_texture_type(aiMaterial* material, aiTextureType type, const std::string& dir_path,const aiScene* scene)
+void create_and_reister_texture_type(utl::vector<std::string>& tex_vector, aiMaterial* material, aiTextureType type, const std::string& dir_path,const aiScene* scene)
 {
+
 	utl::vector<std::string> _textures;
 	for ( unsigned int i = 0; i < material->GetTextureCount(type); ++i )	
 	{
@@ -67,22 +68,18 @@ utl::vector<std::string> create_and_reister_texture_type(aiMaterial* material, a
 			path = dir_path + path;
 			utl::normalize_path(path);
 		}
-
-		std::string _extension = std::filesystem::path(path).extension();
-
-		GLenum format;
-		_extension == ".png" ? format = GL_RGBA : format = GL_RGB;
 		textures::add_texture(path);
-		_textures.emplace_back(path);
+		tex_vector.emplace_back(path);
 	}
-	return _textures;
 }
 
 mesh::material create_and_register_material(aiMaterial* material,const std::string& path,const aiScene* scene)
 {
 	mesh::material material_data;
-	material_data._textures_map = create_and_reister_texture_type(material, aiTextureType_DIFFUSE, path, scene);
-	material_data._specular_map = create_and_reister_texture_type(material, aiTextureType_SPECULAR, path, scene);	
+
+	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_HEIGHT, path, scene);
+	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_DIFFUSE, path, scene);
+	create_and_reister_texture_type(material_data._specular_map, material, aiTextureType_SPECULAR, path, scene);	
 
 	return material_data;
 }

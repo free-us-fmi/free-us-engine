@@ -27,6 +27,7 @@ private:
 
 
 	programs::program_id prog;
+	programs::program_id instanced_prog;
 
 	unsigned int _FBO;
 	GLFWwindow* _window;
