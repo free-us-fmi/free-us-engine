@@ -63,12 +63,12 @@ unsigned int add_mesh(mesh& m)
 		glBindVertexArray(m._VAO);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m._VBO);
-		glBufferStorage(GL_ARRAY_BUFFER, m._vertices.size() * sizeof(vertex), 0, GL_MAP_WRITE_BIT);
-		VBO_data = glMapBufferRange(GL_ARRAY_BUFFER, 0, m._vertices.size() * sizeof(vertex), GL_MAP_WRITE_BIT);
+		glBufferStorage(GL_ARRAY_BUFFER, m._vertices.size() * sizeof(vertex), 0, GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT | GL_MAP_PERSISTENT_BIT);
+		VBO_data = glMapBufferRange(GL_ARRAY_BUFFER, 0, m._vertices.size() * sizeof(vertex), GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT | GL_MAP_PERSISTENT_BIT);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m._EBO);
-		glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, m._indices.size() * sizeof(unsigned int), 0, GL_MAP_WRITE_BIT);	
-		EBO_data = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, m._indices.size() * sizeof(unsigned int), GL_MAP_WRITE_BIT);
+		glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, m._indices.size() * sizeof(unsigned int), 0, GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT | GL_MAP_PERSISTENT_BIT);
+		EBO_data = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, m._indices.size() * sizeof(unsigned int), GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT | GL_MAP_PERSISTENT_BIT);
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 *  sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);

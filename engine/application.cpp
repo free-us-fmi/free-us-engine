@@ -83,7 +83,7 @@ bool application::Initialize()
 	
 	glEnable(GL_DEPTH_TEST);
 
-	for ( unsigned int i = 0; i < 40000; ++i )
+	for ( unsigned int i = 0; i < 20000; ++i )
 	{
 		entt.emplace_back(ecs::create_entity("croissant" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
