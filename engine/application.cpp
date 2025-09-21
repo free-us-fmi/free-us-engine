@@ -114,6 +114,10 @@ bool application::Initialize()
 	_entity->create_geometry("planet", prog);
 	_entity->get_transform()->set_position(glm::vec3(0.0f, -3.f, 0.f));
 	_entity->get_transform()->set_scale(glm::vec3(8.0f, 8.f, 8.f));
+	_entity->create_point_light();
+	_entity->get_point_light()->set_ambient(glm::vec3(0.f, 0.f, 0.f));
+	_entity->get_point_light()->set_diffuse(glm::vec3(0.3f, 0.3f, 0.3f));
+	_entity->get_point_light()->set_specular(glm::vec3(1.f, 1.f, 1.f));
 
 	_program->SetUniform3fv("dirLight.direction", glm::value_ptr(glm::vec3(-0.5f, -1.f, 0.3f)));
 	_program->SetUniform3fv("dirLight.ambient", glm::value_ptr(glm::vec3(0.23f, 0.23f, 0.23f)));
@@ -122,7 +126,7 @@ bool application::Initialize()
 
 	_instanced_program->SetUniform3fv("dirLight.direction", glm::value_ptr(glm::vec3(-0.5f, -1.f, 0.3f)));
 	_instanced_program->SetUniform3fv("dirLight.ambient", glm::value_ptr(glm::vec3(0.23f, 0.23f, 0.23f)));
-	_instanced_program->SetUniform3fv("dirLight.diffuse", glm::value_ptr(glm::vec3(1.f, 1.f, 1.f)));
+	_instanced_program->SetUniform3fv("dirLight.diffuse", glm::value_ptr(glm::vec3(0.3f, 0.3f, 0.3f)));
 	_instanced_program->SetUniform3fv("dirLight.specular", glm::value_ptr(glm::vec3(1.f, 1.f, 1.f)));
 
 
