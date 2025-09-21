@@ -6,6 +6,7 @@ set(BUILD_SHARED_LIBS false)
 project(Sorin_Engine)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_definitions(-D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
 
 add_subdirectory(assimp)
 add_subdirectory(imgui)

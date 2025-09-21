@@ -22,7 +22,7 @@ void update()
 	static bool loading = false;
 
 	ImGui::SetNextWindowSize(ImVec2(512, 1024), ImGuiCond_FirstUseEver);
-	ImGui::Begin("Models");
+	ImGui::Begin("models");
 	if ( ImGui::Button("add model") )
 	{
 		popup = true;
