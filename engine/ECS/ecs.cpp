@@ -58,6 +58,7 @@ void update()
 {
 	components::point_light::update();
 	components::geometry::draw();
+	components::instanced_geometry::update_models();
 }
 	
 }

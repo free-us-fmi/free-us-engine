@@ -36,6 +36,7 @@ void update()
 		transform::update(_entity->get_transform());
 
 	static std::string model_path = "";
+	static std::string component = "";
 
 	if ( ImGui::Button("Add component") )
 	{
@@ -44,6 +45,7 @@ void update()
 		
 		model_browser::popup::initialize();	
 		model_path = "";
+		component = "";
 	}
 	
 	static bool model_popup = false;
@@ -52,17 +54,28 @@ void update()
 	{
 		if ( ImGui::Button("geometry"))
 		{
-			ImGui::SetNextWindowSize(ImVec2(512, 512));
+			component = "geometry";
 			model_popup = true;
 			model_browser::popup::open();
 		}
+
+		if ( ImGui::Button("instanced geometry"))
+		{
+			component = "instanced geometry";
+			model_popup = true;
+			model_browser::popup::open();
+		}
+
 		if ( model_popup)
 			model_browser::popup::update();
 		model_path = model_browser::popup::result();
+
 		if ( model_path != "" )
 		{
 			ImGui::CloseCurrentPopup();
-			_entity->create_geometry(model_path, program_id);
+			if ( component == "geometry" )
+				_entity->create_geometry(model_path, program_id);
+			else _entity->create_instanced_geometry(model_path);
 		}
 
 		ImGui::EndPopup();

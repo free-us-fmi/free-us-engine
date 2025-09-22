@@ -24,6 +24,11 @@ namespace ecs::components::geometry
 	DEFINE_TYPED_ID(geometry);
 }
 
+namespace ecs::components::instanced_geometry 
+{
+	DEFINE_TYPED_ID(instanced_geometry);
+}
+
 namespace data::framebuffer 
 {
 	DEFINE_TYPED_ID(framebuffer);

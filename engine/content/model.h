@@ -12,7 +12,8 @@ struct model
 
 	void draw(programs::program* prog, glm::mat4 global);
 	
-	void instantiate(unsigned int transform_id);
+	void remove_instance(ecs::entity::entity_id entity_id);
+	void instantiate(ecs::entity::entity_id entity_id);
 };
 
 

@@ -77,8 +77,8 @@ mesh::material create_and_register_material(aiMaterial* material,const std::stri
 {
 	mesh::material material_data;
 
-	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_HEIGHT, path, scene);
 	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_DIFFUSE, path, scene);
+	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_HEIGHT, path, scene);
 	create_and_reister_texture_type(material_data._specular_map, material, aiTextureType_SPECULAR, path, scene);	
 
 	return material_data;

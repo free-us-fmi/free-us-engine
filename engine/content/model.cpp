@@ -35,12 +35,21 @@ void remove_model(unsigned int id)
 }
 
 
-void model::instantiate(unsigned int transform_id)
+void model::instantiate(ecs::entity::entity_id entity_id)
 {
-	for ( auto c : _meshes )
+	for ( auto m : _meshes )
 	{
-		mesh::mesh* _mesh = mesh::get_mesh(c);
-		_mesh->instantiate(transform_id);
+		mesh::mesh* _mesh = mesh::get_mesh(m);
+		_mesh->instantiate(entity_id, _local_model);
+	}
+}
+
+void model::remove_instance(ecs::entity::entity_id entity_id)
+{
+		for ( auto m : _meshes )
+	{
+		mesh::mesh* _mesh = mesh::get_mesh(m);
+		_mesh->remove_instance(entity_id);
 	}
 }
 

@@ -4,6 +4,7 @@
 #include <string>
 #include "content_structures.h"
 #include "shaders/program.h"
+#include <unordered_map>
 
 namespace content::mesh 
 {
@@ -17,6 +18,10 @@ struct material
 struct mesh 
 {
 	utl::vector<glm::mat4> _transforms;
+	std::unordered_map<ecs::entity::entity_id, unsigned int> entity_to_transform;
+	std::unordered_map<unsigned int, ecs::entity::entity_id> tranform_to_entity;
+
+	unsigned int _instance_buffer_capacity{0};
 
 	utl::vector<vertex> _vertices;
 	utl::vector<u32> _indices; 
@@ -30,9 +35,9 @@ struct mesh
 
 	void draw(programs::program* prog, glm::mat4 model);
 
-	void remove_instance(unsigned int id);
 	void draw_instanced(programs::program* prog);
-	unsigned int instantiate(unsigned int transform_id);
+	void instantiate(ecs::entity::entity_id entity_id,const glm::mat4& _local_model);
+	void remove_instance(ecs::entity::entity_id);
 };
 
 void render_instanced(programs::program* prog);

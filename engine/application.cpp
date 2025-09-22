@@ -76,16 +76,16 @@ bool application::Initialize()
                             shaders::GetShadersPath() + "default.fs");
         _instanced_program->Link();
 
-	_scene = assets::GetAssetsPath() + "resources/objects/rock/rock.obj";
+	_scene = assets::GetAssetsPath() + "resources/objects/backpack/backpack.obj";
 	_scene2 = assets::GetAssetsPath() + "resources/objects/planet/planet.obj";
 
-	content::scene::create_scene("rock", _scene);	
+	content::scene::create_scene("rock", _scene, true);	
 	content::scene::create_scene("planet", _scene2);	
 	glEnable(GL_DEPTH_TEST);
 
 	float radius = 90.0;
 	float offset = 10.f;
-	int amount = 20000;
+	int amount = 200;
 	for ( unsigned int i = 0; i < amount; ++i )
 	{	
 		float angle = (float)i / (float)amount * 360.0f;
@@ -99,13 +99,13 @@ bool application::Initialize()
 		entt.emplace_back(ecs::create_entity("rock" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
 		_entity->get_transform()->set_position(glm::vec3(x,y,z));
-		float scale = (rand() % 20) / 100.0f + 0.05;
+		float scale = (rand() % 20) / 20.0f + 0.05;
 		_entity->get_transform()->set_scale(glm::vec3(scale, scale, scale));
 		float rotAnglex = (rand() % 360);
 		float rotAngley = (rand() % 360);
 		float rotAnglez = (rand() % 360);
 		_entity->get_transform()->set_rotation(glm::vec3(rotAnglex, rotAngley, rotAnglez));
-      		content::scene::instantiate("rock", _entity->get_transform_id());
+      		content::scene::instantiate("rock", _entity->get_id());
 	}
 
 	entt.emplace_back(ecs::create_entity("planet"));

@@ -53,4 +53,16 @@ components::geometry::geometry* entity::get_geometry()
 	return components::geometry::get_geometry(_geometry);
 }
 
+void entity::create_instanced_geometry(const std::string& model_name)
+{
+	_instanced_geometry = components::instanced_geometry::create_instanced_geometry(_id, model_name);
+}
+
+components::instanced_geometry::instanced_geometry* entity::get_instanced_geometry()
+{
+	return components::instanced_geometry::get_instanced_geometry(_instanced_geometry);
+}
+
+
+
 }

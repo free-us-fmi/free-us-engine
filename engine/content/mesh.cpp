@@ -5,6 +5,7 @@
 #include "ECS/components/transform.h"
 #include <atomic>
 #include <mutex>
+#include "ECS/ecs.h"
 
 namespace content::mesh 
 {
@@ -80,7 +81,7 @@ unsigned int add_mesh(mesh& m)
 		glEnableVertexAttribArray(2);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m._transform_buffer);
-		glBufferData(GL_ARRAY_BUFFER, 20000 * 16 * sizeof(float), nullptr, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(3);
@@ -125,17 +126,6 @@ void remove_mesh(unsigned int id)
 	meshes.erase(meshes.begin() + id);
 }
 
-void mesh::remove_instance(unsigned int id)
-{
-}
-
-void render_instanced(programs::program* prog)
-{
-	std::lock_guard<std::mutex> lg(_mutex);
-	for ( auto mesh : meshes )
-		mesh.draw_instanced(prog);
-}
-
 void mesh::draw_instanced(programs::program* prog)
 {
 	if ( !_transforms.size() )
@@ -159,14 +149,61 @@ void mesh::draw_instanced(programs::program* prog)
 	}
 	glDrawElementsInstanced(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, NULL, _transforms.size());
 }
-	
-unsigned int mesh::instantiate(unsigned int transform_id)
+
+
+void mesh::instantiate(ecs::entity::entity_id entity_id, const glm::mat4& _local_model)
 {
+	if ( entity_to_transform.find(entity_id) != entity_to_transform.end() )
+		return;
+
+	ecs::entity::entity* entity = ecs::get_entity(entity_id);
+	ecs::components::transform::transform_id transform_id = entity->get_transform_id();
+
 	ecs::components::transform::transform* transform = ecs::components::transform::get_transform(transform_id);
-	_transforms.push_back(transform->get_model());
+	_transforms.push_back(transform->get_model() * _local_model);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, _transform_buffer);
-	glBufferSubData(GL_ARRAY_BUFFER, 16 * sizeof(float) * (_transforms.size() - 1), 16 * sizeof(float), _transforms.end() - 1);
-	return _transforms.size() - 1;
+
+	if ( _instance_buffer_capacity >= _transforms.capacity() )
+		glBufferSubData(GL_ARRAY_BUFFER, 16 * sizeof(float) * (_transforms.size() - 1), 16 * sizeof(float), _transforms.end() - 1);
+	else 
+	{
+		std::cout << "increased capacity to " << _transforms.capacity() << std::endl;
+		_instance_buffer_capacity = _transforms.capacity();
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16 * _transforms.capacity(), nullptr, GL_DYNAMIC_DRAW);	
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 16 * _transforms.size(), _transforms.data());
+	}
+	entity_to_transform[entity_id] = _transforms.size() - 1;
+	tranform_to_entity[_transforms.size() - 1] = entity_id;
 }
 
+void mesh::remove_instance(ecs::entity::entity_id entity_id)
+{
+	assert( entity_to_transform.find(entity_id) != entity_to_transform.end());
+
+	ecs::components::transform::transform_id transform_id = entity_to_transform[entity_id];
+	entity_to_transform.erase(entity_id);
+
+	if ( transform_id == _transforms.size() - 1 )
+	{
+		_transforms.erase(_transforms.end() - 1);
+		return;
+	}
+	ecs::entity::entity_id entity_to_be_move = tranform_to_entity[_transforms.size() - 1];
+	entity_to_transform[entity_id] = transform_id;
+
+	_transforms[transform_id] = _transforms[_transforms.size() - 1];	
+	_transforms.erase(_transforms.end() - 1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _VAO);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * 16 * transform_id, sizeof(float) * 16, &_transforms[transform_id]);
+
+}
+
+void render_instanced(programs::program* prog)
+{
+	std::lock_guard<std::mutex> lg(_mutex);
+	for ( auto& mesh : meshes )
+		mesh.draw_instanced(prog);
+}
 }

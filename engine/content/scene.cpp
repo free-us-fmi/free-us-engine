@@ -54,13 +54,31 @@ scene* get_scene(const std::string& path)
 	return &scenes[path];
 }
 
-void instantiate(const std::string& path, unsigned int transform_id)
+void scene::instantiate(ecs::entity::entity_id entity_id)
 {
-	for ( auto m : scenes[path]._models )
+	for ( auto m : _models )
 	{
 		auto model = model::get_model(m);
-		model->instantiate(transform_id);
+		model->instantiate(entity_id);
 	}
 }
 
+void scene::remove_instance(ecs::entity::entity_id entity_id)
+{
+	for ( auto m : _models )
+	{
+		auto model = model::get_model(m);
+		model->remove_instance(entity_id);
+	}
+}
+
+void instantiate(const std::string& path, ecs::entity::entity_id entity_id)
+{
+	scenes[path].instantiate(entity_id);
+}
+
+void remove_instance(const std::string& path, ecs::entity::entity_id entity_id)
+{
+	scenes[path].remove_instance(entity_id);
+}
 }

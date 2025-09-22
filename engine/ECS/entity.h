@@ -3,6 +3,8 @@
 #include "components/transform.h"
 #include "components/lights/point_light.h"
 #include "components/geometry.h"
+#include "components/instanced_geometry.h"
+
 #include "shaders/program.h"
 namespace ecs::entity 
 {
@@ -13,6 +15,7 @@ class entity
 friend class components::transform::transform;
 friend class components::point_light::point_light;
 friend class components::geometry::geometry;
+friend class components::instanced_geometry::instanced_geometry;
 
 public:
 	entity();
@@ -25,10 +28,12 @@ public:
 	components::transform::transform* get_transform();
 	components::point_light::point_light* get_point_light();
 	components::geometry::geometry* get_geometry();
+	components::instanced_geometry::instanced_geometry* get_instanced_geometry();
 	
 	components::transform::transform_id get_transform_id() const { return _transform; }
 
-	void create_geometry(const std::string& model_path, programs::program_id program_id, bool texture_flipped = false);
+	void create_geometry(const std::string& model_name, programs::program_id program_id, bool texture_flipped = false);
+	void create_instanced_geometry(const std::string& model_name);
 	void create_transform();
 	void create_point_light(); 
 
@@ -42,6 +47,7 @@ private:
 	components::transform::transform_id _transform{id::invalid_id};
 	components::point_light::point_light_id _point_light{id::invalid_id};
 	components::geometry::geometry_id _geometry{id::invalid_id};
+	components::instanced_geometry::instanced_geometry_id _instanced_geometry{id::invalid_id};
 };
 
 }
