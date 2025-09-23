@@ -7,6 +7,8 @@
 #include "assets/AssetsPath.h"
 #include "content/scene.h"
 #include "editor/content/model_popup.h"
+#include "geometry_view.h"
+#include "lights/pointlight_view.h"
 
 namespace editor::selected_entity 
 {
@@ -34,6 +36,8 @@ void update()
 	
 	if ( _entity->get_transform() != nullptr )
 		transform::update(_entity->get_transform());
+	geometry::update(id, program_id);
+	pointlight::update(_entity->get_point_light());
 
 	static std::string model_path = "";
 	static std::string component = "";
@@ -64,6 +68,13 @@ void update()
 			component = "instanced geometry";
 			model_popup = true;
 			model_browser::popup::open();
+		}
+
+		if ( ImGui::Button("point light"))
+		{
+			component = "point light";
+			_entity->create_point_light();
+			ImGui::CloseCurrentPopup();
 		}
 
 		if ( model_popup)

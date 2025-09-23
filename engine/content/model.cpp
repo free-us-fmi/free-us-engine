@@ -18,7 +18,7 @@ void model::draw(programs::program* prog, glm::mat4 global)
 model* get_model(unsigned int id)
 {
 	assert(id < models.size());
-	assert(!models.is_tombstone(models.begin() + id));
+	assert(!models.is_tombstone(models.internal_begin() + id));
 
 	return &models[id];
 }
@@ -31,7 +31,7 @@ unsigned int add_model(const model& m)
 void remove_model(unsigned int id)
 {
 	assert( id < models.size() );
-	models.erase(models.begin() + id);
+	models.erase(models.internal_begin() + id);
 }
 
 
@@ -46,7 +46,7 @@ void model::instantiate(ecs::entity::entity_id entity_id)
 
 void model::remove_instance(ecs::entity::entity_id entity_id)
 {
-		for ( auto m : _meshes )
+	for ( auto m : _meshes )
 	{
 		mesh::mesh* _mesh = mesh::get_mesh(m);
 		_mesh->remove_instance(entity_id);

@@ -46,7 +46,7 @@ mesh* get_mesh(unsigned int id)
 {
 	std::lock_guard<std::mutex> lg(_mutex);
 	assert(id < meshes.size());
-	assert(!meshes.is_tombstone(meshes.begin() + id));
+	assert(!meshes.is_tombstone(meshes.internal_begin() + id));
 
 	return &meshes[id];
 }
@@ -123,7 +123,7 @@ void remove_mesh(unsigned int id)
 	mesh& m = meshes[id];
 	glDeleteBuffers(1, &m._EBO);
 	glDeleteBuffers(1, &m._VBO);
-	meshes.erase(meshes.begin() + id);
+	meshes.erase(meshes.internal_begin() + id);
 }
 
 void mesh::draw_instanced(programs::program* prog)
@@ -153,6 +153,7 @@ void mesh::draw_instanced(programs::program* prog)
 
 void mesh::instantiate(ecs::entity::entity_id entity_id, const glm::mat4& _local_model)
 {
+	assert ( entity_to_transform.find(entity_id) == entity_to_transform.end() );
 	if ( entity_to_transform.find(entity_id) != entity_to_transform.end() )
 		return;
 
@@ -160,8 +161,9 @@ void mesh::instantiate(ecs::entity::entity_id entity_id, const glm::mat4& _local
 	ecs::components::transform::transform_id transform_id = entity->get_transform_id();
 
 	ecs::components::transform::transform* transform = ecs::components::transform::get_transform(transform_id);
-	_transforms.push_back(transform->get_model() * _local_model);
+	_transforms.emplace_back(transform->get_model() * _local_model);
 	
+	glBindVertexArray(_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, _transform_buffer);
 
 	if ( _instance_buffer_capacity >= _transforms.capacity() )
@@ -180,6 +182,8 @@ void mesh::instantiate(ecs::entity::entity_id entity_id, const glm::mat4& _local
 void mesh::remove_instance(ecs::entity::entity_id entity_id)
 {
 	assert( entity_to_transform.find(entity_id) != entity_to_transform.end());
+	if ( entity_to_transform.find(entity_id) == entity_to_transform.end() )
+		return;
 
 	ecs::components::transform::transform_id transform_id = entity_to_transform[entity_id];
 	entity_to_transform.erase(entity_id);
@@ -189,13 +193,14 @@ void mesh::remove_instance(ecs::entity::entity_id entity_id)
 		_transforms.erase(_transforms.end() - 1);
 		return;
 	}
-	ecs::entity::entity_id entity_to_be_move = tranform_to_entity[_transforms.size() - 1];
-	entity_to_transform[entity_id] = transform_id;
+	ecs::entity::entity_id entity_to_be_moved = tranform_to_entity[_transforms.size() - 1];
+	entity_to_transform[entity_to_be_moved] = transform_id;
+	tranform_to_entity[transform_id] = entity_to_be_moved;
 
 	_transforms[transform_id] = _transforms[_transforms.size() - 1];	
-	_transforms.erase(_transforms.end() - 1);
+	_transforms.erase(_transforms.internal_end() - 1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, _VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, _transform_buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * 16 * transform_id, sizeof(float) * 16, &_transforms[transform_id]);
 
 }

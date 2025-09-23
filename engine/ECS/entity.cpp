@@ -22,10 +22,9 @@ void entity::destroy()
 {
 	if ( components::transform::is_valid(_transform) )
 		components::transform::delete_transform(_transform);
-	if ( components::point_light::is_valid(_point_light) )
-		components::point_light::delete_point_light(_point_light);
-	if ( components::geometry::is_valid(_geometry))
-		components::geometry::remove_geometry(_geometry);
+	remove_point_light();
+	remove_geometry();
+	remove_instanced_geometry();
 }
 
 components::transform::transform* entity::get_transform()
@@ -63,6 +62,26 @@ components::instanced_geometry::instanced_geometry* entity::get_instanced_geomet
 	return components::instanced_geometry::get_instanced_geometry(_instanced_geometry);
 }
 
+void entity::remove_geometry()
+{
+	if ( components::geometry::is_valid(_geometry))
+		components::geometry::remove_geometry(_geometry);
+	_geometry = id::invalid_id;
 
+}
+
+void entity::remove_instanced_geometry()
+{
+	if ( components::instanced_geometry::is_valid(_instanced_geometry) )
+		components::instanced_geometry::remove_instanced_geometry(_instanced_geometry);
+	_instanced_geometry = id::invalid_id;
+}
+
+void entity::remove_point_light()
+{
+	if ( components::point_light::is_valid(_point_light) )
+		components::point_light::delete_point_light(_point_light);
+	_point_light = id::invalid_id;
+}
 
 }

@@ -31,11 +31,20 @@ public:
 	components::instanced_geometry::instanced_geometry* get_instanced_geometry();
 	
 	components::transform::transform_id get_transform_id() const { return _transform; }
+	components::transform::transform_id get_geometry_id() const { return _geometry; }
+	components::transform::transform_id get_instanced_geometry_id() const { return _instanced_geometry; }
+	components::transform::transform_id get_point_light_id() const { return _point_light; }
+
+	void create_transform();
 
 	void create_geometry(const std::string& model_name, programs::program_id program_id, bool texture_flipped = false);
+	void remove_geometry();
+
 	void create_instanced_geometry(const std::string& model_name);
-	void create_transform();
+	void remove_instanced_geometry();
+
 	void create_point_light(); 
+	void remove_point_light();
 
 	void update();
 

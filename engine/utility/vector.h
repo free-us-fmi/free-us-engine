@@ -41,7 +41,9 @@ public:
 		clear();
 		reserve(other.size());
 		
-		for ( auto& c : other)
+		for ( unsigned int i = 0; i < other.size(); ++i )
+		{
+			T& c = *(other.data() + i);
 			if constexpr (disable_tombstoning)
 				emplace_back(c);
 			else if ( !other.is_tombstone(&c) )
@@ -50,6 +52,7 @@ public:
 				memset(end(), 'd', sizeof(T));
 				_size++;
 			}
+		}
 		
 		return *this;
 	}
@@ -140,6 +143,16 @@ public:
 		else return iterator::iterator<vector, T>(_data + _size);
 	}
 
+	T* internal_begin() const 
+	{
+		return _data;
+	}
+
+	T* internal_end() const 
+	{
+		return _data + _size;
+	}
+
 	constexpr void insert(T* position, const T& value)
 	{
 		static_assert(disable_tombstoning);
@@ -150,15 +163,15 @@ public:
 	{
 		static_assert(disable_tombstoning);
 		assert(range_end > range_start);
-		assert(position >= begin() && position <= end());
+		assert(position >= internal_begin() && position <= internal_end());
 
 		unsigned int spaces = range_end - range_start;
 
-		unsigned int offset = position - begin();
+		unsigned int offset = position - internal_begin();
 
 		controlled_reserve(_size + spaces);
 
-		position = begin() + offset;
+		position = internal_begin() + offset;
 		
 		for ( T* it = end() + spaces - 1; it >= position + spaces; --it )
 		{
@@ -176,13 +189,13 @@ public:
 	constexpr void emplace(T* position, Targs&&... args)
 	{
 		static_assert(disable_tombstoning);
-		assert(position >= begin() && position <= end() );
+		assert(position >= internal_begin() && position <= internal_end() );
 
-		unsigned int offset = position - begin();
+		unsigned int offset = position - internal_begin();
 
 		controlled_reserve(_size + 1);
 
-		position = begin() + offset;
+		position = internal_begin() + offset;
 
 		for ( T* it = end(); it > position; --it )
 		{
@@ -223,21 +236,21 @@ public:
 	{
 		erase(position, position + 1);
 	}
-
+	#include <iostream>
 	constexpr void erase(T* range_start, T* range_end )
 	{
 		assert(_data);
 		assert(range_start <= range_end);
-		assert(begin() <= range_start && range_end <= end());
+		assert(internal_begin() <= range_start && range_end <= internal_end()); 
 
 		unsigned int spaces = range_end - range_start;
-		unsigned int spaces_to_move = end() - range_end;
+		unsigned int spaces_to_move = internal_end() - range_end;
 		
 		if constexpr ( disable_tombstoning )
 		{
 			std::move(range_end, static_cast<T*>(end()), range_start);
 
-			for ( T* it = end() - spaces; it != end(); ++it )
+			for ( T* it = internal_end() - spaces; it != internal_end(); ++it )
 				it->~T();
 
 			_size -= spaces;
@@ -375,7 +388,7 @@ public:
 
 	~vector()
 	{
-		for ( T* value = begin(); value < end(); ++value )
+		for ( T* value = internal_begin(); value < internal_end(); ++value )
         		if constexpr (disable_tombstoning)
 			    value->~T();
         		else

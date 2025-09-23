@@ -19,8 +19,8 @@ public:
 	void update();
 
 
-	void add_to_program(unsigned int id);
-	void remove_from_program(unsigned int id);
+	void add_to_program(programs::program_id id);
+	void remove_from_program(programs::program_id id);
 	void update_programs();
 
 	void set_position(const glm::vec3& position);
@@ -33,7 +33,6 @@ public:
 	void set_quadratic(const float& quadratic);
 	
 	void set_active(bool value);
-	glm::vec3 get_position() const { return _position; }
 	glm::vec3 get_ambient() const { return _ambient; }
 	glm::vec3 get_diffuse() const { return _diffuse; }
 	glm::vec3 get_specular() const { return _specular; }
@@ -44,6 +43,7 @@ public:
 
 	bool get_active() const { return _active;}
 private:
+	glm::vec3 get_position() const { return _position; }
 	std::string get_uniform_name(const std::string& var_name) const;
 	void internal_update_program(unsigned int id);
 private:
@@ -58,7 +58,7 @@ private:
 
 	glm::vec3 _position{0., 0.f, 0.f};
 	glm::vec3 _ambient{0.f, 0.f, 0.f};
-	glm::vec3 _diffuse{0.f, 0.f, 0.f};
+	glm::vec3 _diffuse{1.f, 1.f, 1.f};
 	glm::vec3 _specular{0.f, 0.f, 0.f};
 
 	float _constant{1.f};
@@ -67,6 +67,8 @@ private:
 
 	bool _active{true};
 };
+
+void add_lighted_program(programs::program_id program);
 
 point_light_id create_point_light(entity::entity_id entity);
 void delete_point_light(point_light_id id);

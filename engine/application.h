@@ -20,6 +20,7 @@ public:
 	void set_fbo(unsigned int fbo) { _FBO = fbo;}
 	GLFWwindow* get_window() const { return _window; }
 	programs::program_id get_program() const { return prog; }
+	programs::program_id get_instanced_program() const { return instanced_prog; }
 private:
 	std::string _texture;
 	std::string _texture_specular;

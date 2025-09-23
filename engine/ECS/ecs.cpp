@@ -51,7 +51,7 @@ void remove_entity(entity::entity_id id)
 	entity_data[index].destroy();
 	++ generations[index];
 	
-	entity_data.erase(entity_data.begin() + index);
+	entity_data.erase(entity_data.internal_begin() + index);
 }
 
 void update()

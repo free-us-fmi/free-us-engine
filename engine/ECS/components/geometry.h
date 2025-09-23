@@ -13,7 +13,9 @@ namespace ecs::components::geometry
 class geometry 
 {
 public:
-	geometry(entity::entity_id entity, const std::string& model_name, programs::program_id program_id, bool texture_flipped = false);	
+	geometry(entity::entity_id entity, const std::string& model_name, programs::program_id program_id, bool texture_flipped = false);
+	std::string get_model_name() const { return  _name;}
+
 	void draw();
 private:
 	programs::program_id _program_id;

@@ -22,22 +22,23 @@ transform_id create_transform(entity::entity_id entity)
 
 void delete_transform(transform_id id)
 {
-	assert( id::generation(id) < generations.size());
 	assert(id::generation(id) == generations[id::index(id)]);
-	transforms.erase(transforms.begin() + id::index(id));
+	transforms.erase(transforms.internal_begin() + id::index(id));
 	++generations[id::index(id)];
 }
 
 bool is_valid(transform_id id)
 {
-	assert(id::is_valid(id));
+	if ( id == id::invalid_id )
+		return false;
+
 	return id::generation(id) == generations[id::index(id)];
 }
 
 transform* get_transform(transform_id id )
 {
-	assert(id::index(id) < transforms.size());
-	assert(id::generation(id) == generations[id::index(id)]);
+	if ( !is_valid(id) )
+		return nullptr;
 
 	return &transforms[id::index(id)];
 }
@@ -57,6 +58,8 @@ transform::transform(entity::entity_id entity)
 
 void transform::set_position(const glm::vec3& position)
 {
+	if ( _position_vec == position )
+		return;
 	_position_vec = position;
 	_position = glm::translate(glm::mat4(1.f), position); 
 
@@ -65,6 +68,8 @@ void transform::set_position(const glm::vec3& position)
 
 void transform::set_rotation(const glm::vec3& rotation)
 {
+	if ( _rotation_vec == rotation )
+		return;
 	_rotation_vec = rotation;
 
 	_rotation = glm::rotate(glm::mat4(1.f), glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
@@ -76,6 +81,9 @@ void transform::set_rotation(const glm::vec3& rotation)
 
 void transform::set_scale(const glm::vec3& scale)
 {
+	if ( _scale_vec == scale )
+		return;
+
 	_scale_vec = scale;
 
 	_scale = glm::scale(glm::mat4(1.f), scale);

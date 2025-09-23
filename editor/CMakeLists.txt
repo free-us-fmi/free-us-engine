@@ -6,6 +6,9 @@ add_executable(editor main.cpp
 		ECS/entity_view.cpp
 		ECS/components/selected_entity_view.cpp
 		ECS/components/transform_view.cpp
+		ECS/components/geometry_view.cpp
+		ECS/components/lights/pointlight_view.cpp
+
 		utility/EditorPath.cpp
 		utility/helpers/draw_browser.cpp
 		utility/helpers/progress_bar/progess_popup.cpp

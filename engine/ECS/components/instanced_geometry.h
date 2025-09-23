@@ -14,6 +14,7 @@ public:
 	void destroy();
 	void update();
 
+	std::string get_model_name() const { return  _model;}
 private:
 	glm::mat4 _model_mat;
 	bool instatiated = false;
@@ -27,5 +28,5 @@ void remove_instanced_geometry(instanced_geometry_id id);
 instanced_geometry* get_instanced_geometry(instanced_geometry_id id);
 
 void update_models();
-
+bool is_valid(instanced_geometry_id id);
 }

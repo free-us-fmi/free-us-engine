@@ -9,8 +9,8 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 position;
 
-vec3 light_color = vec3(0.5f, 0.5f, 0.5f);
-float specular_strength = 0.5;
+vec3 light_color = vec3(1.0f, 1.f, 1.f);
+float specular_strength = 1.0;
 
 struct Material
 {
@@ -47,7 +47,7 @@ struct PointLight
     float linear;
     float quadratic;
 };
-#define NUM_POINT_LIGHTS 10 
+#define NUM_POINT_LIGHTS 10
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
 
 struct SpotLight
@@ -115,16 +115,16 @@ vec3 GetSpotLight(in SpotLight spotLight)
 
 void main()
 {
-	if (isLight)
-	{
-		FragColor = vec4(light_color, 1.f);
-		return;
-	}
-	
-	vec3 _output = vec3(0.f);
-	for ( int i = 0; i < NUM_POINT_LIGHTS; ++i )
-		if ( pointLights[i].is_active )
-			_output += GetPointLight(pointLights[i]);
-	_output += GetDirectionalLight(dirLight);
-	FragColor = vec4(_output, 1.f);
+    if (isLight)
+    {
+        FragColor = vec4(light_color, 1.f);
+        return;
+    }
+
+    vec3 _output = vec3(0.f);
+    for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
+        if (pointLights[i].is_active)
+            _output += GetPointLight(pointLights[i]);
+    _output += GetDirectionalLight(dirLight);
+    FragColor = vec4(_output, 1.f);
 }

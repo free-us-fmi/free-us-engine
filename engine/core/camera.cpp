@@ -42,7 +42,7 @@ void MouseCursorCallback(GLFWwindow* window, double xpos, double ypos)
 	rotation.y += _ypos / 10;
 }
 
-double last_time; 
+float last_time; 
 void Initialize(GLFWwindow* win)
 {
 	last_time = glfwGetTime();
@@ -64,8 +64,8 @@ glm::vec3 forward = glm::vec4(0.f, 0.f, -1.f, 1.f);
 
 void Update()
 {
-	double new_time = glfwGetTime();
-	double delta = new_time - last_time;
+	float new_time = glfwGetTime();
+	float delta = new_time - last_time;
 	
 	last_time = new_time;
 
@@ -75,29 +75,30 @@ void Update()
 	transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(0.f, 1.f, 0.f));
 	transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(1.f, 0.f, 0.f));
 	
-	up = transform * glm::vec4(up, 1.f);
-	forward = transform * glm::vec4(forward, 1.f);
+	glm::mat3 vec_transform = glm::transpose(glm::inverse(transform));
+	up = glm::normalize(vec_transform * up);
+	forward = glm::normalize(vec_transform * forward);
 	
 	glm::vec3 difference = glm::vec3(0.f, 0.f, 0.f);
 
-	rotation.x += key_map[GLFW_KEY_LEFT] * delta * 60.f;
-	rotation.x -= key_map[GLFW_KEY_RIGHT] * delta * 60.f;
-	rotation.y -= key_map[GLFW_KEY_DOWN] * delta * 60.f;
-	rotation.y += key_map[GLFW_KEY_UP] * delta * 60.f;
+	rotation.x += (float)key_map[GLFW_KEY_LEFT] * delta * 60.f;
+	rotation.x -= (float)key_map[GLFW_KEY_RIGHT] * delta * 60.f;
+	rotation.y -= (float)key_map[GLFW_KEY_DOWN] * delta * 60.f;
+	rotation.y += (float)key_map[GLFW_KEY_UP] * delta * 60.f;
 
 	if ( key_map[GLFW_KEY_W] )
 		difference += forward;
-	else if ( key_map[GLFW_KEY_S] )
+	if ( key_map[GLFW_KEY_S] )
 		difference  -= forward;
 	
 	if ( key_map[GLFW_KEY_D] )
 		difference -= glm::cross(up, forward);
-	else if ( key_map[GLFW_KEY_A] )
+	if ( key_map[GLFW_KEY_A] )
 		difference += glm::cross(up, forward);
 
 	if ( key_map[GLFW_KEY_Z] )
 		 difference += up;
-	else if ( key_map[GLFW_KEY_X] )
+	if ( key_map[GLFW_KEY_X] )
 		difference -= up;
 
 	difference *= delta * camera_speed;

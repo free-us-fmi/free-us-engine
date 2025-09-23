@@ -76,6 +76,9 @@ bool application::Initialize()
                             shaders::GetShadersPath() + "default.fs");
         _instanced_program->Link();
 
+	ecs::components::point_light::add_lighted_program(prog);
+	ecs::components::point_light::add_lighted_program(instanced_prog);
+
 	_scene = assets::GetAssetsPath() + "resources/objects/backpack/backpack.obj";
 	_scene2 = assets::GetAssetsPath() + "resources/objects/planet/planet.obj";
 
@@ -83,9 +86,9 @@ bool application::Initialize()
 	content::scene::create_scene("planet", _scene2);	
 	glEnable(GL_DEPTH_TEST);
 
-	float radius = 90.0;
+	float radius = 50.0;
 	float offset = 10.f;
-	int amount = 200;
+	int amount = 10;
 	for ( unsigned int i = 0; i < amount; ++i )
 	{	
 		float angle = (float)i / (float)amount * 360.0f;
@@ -99,13 +102,13 @@ bool application::Initialize()
 		entt.emplace_back(ecs::create_entity("rock" + std::to_string(i)));
 		auto _entity = ecs::get_entity(entt[i]);
 		_entity->get_transform()->set_position(glm::vec3(x,y,z));
-		float scale = (rand() % 20) / 20.0f + 0.05;
+		float scale = (rand() % 20) / 10.0f + 0.05;
 		_entity->get_transform()->set_scale(glm::vec3(scale, scale, scale));
 		float rotAnglex = (rand() % 360);
 		float rotAngley = (rand() % 360);
 		float rotAnglez = (rand() % 360);
 		_entity->get_transform()->set_rotation(glm::vec3(rotAnglex, rotAngley, rotAnglez));
-      		content::scene::instantiate("rock", _entity->get_id());
+		_entity->create_instanced_geometry("rock");
 	}
 
 	entt.emplace_back(ecs::create_entity("planet"));
@@ -114,10 +117,7 @@ bool application::Initialize()
 	_entity->create_geometry("planet", prog);
 	_entity->get_transform()->set_position(glm::vec3(0.0f, -3.f, 0.f));
 	_entity->get_transform()->set_scale(glm::vec3(8.0f, 8.f, 8.f));
-	_entity->create_point_light();
-	_entity->get_point_light()->set_ambient(glm::vec3(0.f, 0.f, 0.f));
-	_entity->get_point_light()->set_diffuse(glm::vec3(0.3f, 0.3f, 0.3f));
-	_entity->get_point_light()->set_specular(glm::vec3(1.f, 1.f, 1.f));
+
 
 	_program->SetUniform3fv("dirLight.direction", glm::value_ptr(glm::vec3(-0.5f, -1.f, 0.3f)));
 	_program->SetUniform3fv("dirLight.ambient", glm::value_ptr(glm::vec3(0.23f, 0.23f, 0.23f)));

@@ -32,6 +32,10 @@ void geometry::draw()
 	if ( glm::length(_entity->get_transform()->get_position() - glm::vec3(0.f, 0.f, 0.f)) > 1000)
 		return;
 	programs::program* _program = programs::GetProgram(_program_id);
+
+	if ( _entity->_point_light != id::invalid_id )
+		_program->SetUniform1i("isLight", true);
+
 	_scene->draw(_program, _entity->get_transform()->get_model());
 }
 
@@ -48,16 +52,16 @@ geometry_id create_geometry(entity::entity_id entity, const std::string& model_n
 
 void remove_geometry(geometry_id id)
 {
-	assert( id::generation(id) < generations.size());
 	assert(id::generation(id) == generations[id::index(id)]);
-	components.erase(components.begin() + id::index(id));
+	std::cout << "removing geometry with generation " << id::generation(id) << " and index " << id::index(id) <<std::endl;
+	components.erase(components.internal_begin() + id::index(id));
 	++generations[id::index(id)];
 }
 
 geometry* get_geometry(geometry_id id )
 {
-	assert(id::index(id) < components.size());
-	assert(id::generation(id) == generations[id::index(id)]);
+	if ( !is_valid(id) )
+		return nullptr;
 
 	return &components[id::index(id)];
 }
@@ -70,7 +74,8 @@ void draw()
 
 bool is_valid(geometry_id id)
 {
-	assert(id::is_valid(id));
+	if ( id == id::invalid_id )
+		return false;
 	return id::generation(id) == generations[id::index(id)];
 }
 
