@@ -25,6 +25,7 @@ add_library(engine STATIC ../glad/src/glad.c
 		content/mesh.cpp 
 		content/model.cpp 
 		content/scene.cpp 
+		content/primitives/primitive_loader.cpp
 
 		data/Framebuffer.cpp
 

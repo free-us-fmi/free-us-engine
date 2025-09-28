@@ -16,19 +16,21 @@ public:
 	{
 		VERTEX = 0,
 		FRAGMENT,
+		GEOMETRY
 	};
 
 	program();
 	void AddShader(ShaderType type, const std::string& path);
 	void Link();
 	void Bind();
-	
+	void SetDepthTest(GLenum test) { _depth_test = test; };
 	unsigned int  GetId() const { return _id; }
 
 private:
 	int GetUniformLocation(const std::string& uniform_name);
 
 private:
+	GLenum _depth_test = GL_LESS;	
 	bool _linked = false;
 	unsigned int _id = 0;
 	std::unordered_map<std::string, int>_uniform_cache;

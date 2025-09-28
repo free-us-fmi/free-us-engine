@@ -18,17 +18,20 @@ void update(ecs::entity::entity_id entity_id, programs::program_id program_id)
 		ecs::components::geometry::geometry* geometry = entity->get_geometry();
 		ImGui::Text("geometry");
 		ImGui::Text("%s", geometry->get_model_name().c_str());
+		
 		if ( ImGui::Button("Change model") )
 		{
 			model_browser::popup::initialize();
 			model_browser::popup::open();
 			popup = true;
 		}
+
+			
 		if ( model_path != "" )
 		{
 			ImGui::CloseCurrentPopup();
 			entity->remove_geometry();
-			entity->create_geometry(model_path, program_id);
+			entity->create_geometry(model_path, model_browser::popup::program_result());
 			model_path = "";
 			popup = false;
 		}

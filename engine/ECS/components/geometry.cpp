@@ -12,10 +12,10 @@ namespace {
 	utl::vector<unsigned int> generations;
 }
 
-geometry::geometry(entity::entity_id entity, const std::string& model_name, programs::program_id program_id, bool texture_flipped)
+geometry::geometry(entity::entity_id entity, const std::string& model_name,const utl::vector<programs::program_id>& program_ids, bool texture_flipped)
 {
 	_entity_id = entity;
-	_program_id = program_id;
+	_program_ids = program_ids;
 	_name = model_name;
 }
 
@@ -31,17 +31,24 @@ void geometry::draw()
 	}
 	if ( glm::length(_entity->get_transform()->get_position() - glm::vec3(0.f, 0.f, 0.f)) > 1000)
 		return;
-	programs::program* _program = programs::GetProgram(_program_id);
 
-	if ( _entity->_point_light != id::invalid_id )
-		_program->SetUniform1i("isLight", true);
+	for ( auto program_id : _program_ids )
+	{
+		programs::program* _program = programs::GetProgram(program_id);
+		_program->Bind();
 
-	_scene->draw(_program, _entity->get_transform()->get_model());
+		if ( _entity->_point_light != id::invalid_id )
+			_program->SetUniform1i("isLight", true);
+		else 
+			_program->SetUniform1i("isLight", false);
+
+		_scene->draw(_program, _entity->get_transform()->get_model());
+	}
 }
 
-geometry_id create_geometry(entity::entity_id entity, const std::string& model_name, programs::program_id program_id, bool texture_flipped)
+geometry_id create_geometry(entity::entity_id entity, const std::string& model_name, utl::vector<programs::program_id> program_ids, bool texture_flipped)
 {
-	unsigned int index = components.emplace_tombstone(entity, model_name, program_id, texture_flipped);
+	unsigned int index = components.emplace_tombstone(entity, model_name, program_ids, texture_flipped);
 	if ( index >= generations.size() )
 		generations.emplace_back(0);
 	
@@ -53,7 +60,6 @@ geometry_id create_geometry(entity::entity_id entity, const std::string& model_n
 void remove_geometry(geometry_id id)
 {
 	assert(id::generation(id) == generations[id::index(id)]);
-	std::cout << "removing geometry with generation " << id::generation(id) << " and index " << id::index(id) <<std::endl;
 	components.erase(components.internal_begin() + id::index(id));
 	++generations[id::index(id)];
 }

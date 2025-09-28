@@ -5,6 +5,7 @@
 #include "editor/utility/EditorPath.h"
 #include "editor/utility/helpers/draw_browser.h"
 #include "utility/vector.h"
+
 namespace editor::model_browser
 {
 

@@ -37,7 +37,7 @@ public:
 
 	void create_transform();
 
-	void create_geometry(const std::string& model_name, programs::program_id program_id, bool texture_flipped = false);
+	void create_geometry(const std::string& model_name, utl::vector<programs::program_id> program_ids, bool texture_flipped = false);
 	void remove_geometry();
 
 	void create_instanced_geometry(const std::string& model_name);

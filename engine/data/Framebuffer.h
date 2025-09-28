@@ -11,6 +11,7 @@ class framebuffer
 public:
 	struct FramebufferBuffer
 	{	
+		bool _multi_sampling = false;
 		GLenum _format;
 		GLenum _attachment;
 		unsigned int _id{id::invalid_id};
@@ -20,7 +21,7 @@ public:
 	void clear();
 
 	void add_renderbuffer(const std::string& name, GLenum format, GLenum attachment);
-	void add_texture_2d(const std::string& name, GLenum format, GLenum attachment);
+	void add_texture_2d(const std::string& name, GLenum format, GLenum attachment, bool ms = false);
 
 	unsigned int get_texture_2d(const std::string& name);
 	unsigned int get_renderbuffer(const std::string& name);
@@ -36,6 +37,8 @@ public:
 
 	void set_size(int width, int height);
 	
+	void resolve(unsigned int target);
+
 	void destroy();
 private:
 	void update_textures();
@@ -47,7 +50,8 @@ private:
 	std::unordered_map<std::string, FramebufferBuffer> _textures_2d;
 	int _width, _height;
 
-	glm::vec3 _clear_color = {0.2f, 0.2f, 0.2f};
+	glm::vec3 _clear_color = {0.05f, 0.05f, 0.05f};
+
 	
 };
 

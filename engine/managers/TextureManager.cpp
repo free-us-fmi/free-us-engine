@@ -112,9 +112,9 @@ void texture_2d::initialize(std::string path)
 		GLenum format, internal_format;
 		glBindTexture(GL_TEXTURE_2D, _id);
 		if ( channels == 4 )
-			format = internal_format = GL_RGBA;
+			format = GL_RGBA, internal_format = GL_SRGB_ALPHA;
 		else if ( channels == 3) 
-			format = internal_format = GL_RGB;
+			format = GL_RGB, internal_format = GL_SRGB;
 		else format = internal_format = GL_ALPHA;
 
 		glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);

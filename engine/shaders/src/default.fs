@@ -5,9 +5,15 @@ uniform sampler2D _texture;
 uniform bool isLight;
 uniform vec3 eyePos;
 
-in vec2 texCoord;
-in vec3 normal;
-in vec3 position;
+in S_OUT{
+	vec2 texCoord;
+	vec3 normal;
+	vec3 position;
+} s_in;
+
+vec2 texCoord;
+vec3 normal;
+vec3 position;
 
 vec3 light_color = vec3(1.0f, 1.f, 1.f);
 float specular_strength = 1.0;
@@ -115,16 +121,20 @@ vec3 GetSpotLight(in SpotLight spotLight)
 
 void main()
 {
-    if (isLight)
-    {
-        FragColor = vec4(light_color, 1.f);
-        return;
-    }
+	texCoord = s_in.texCoord;
+	normal = s_in.normal;
+	position = s_in.position;
 
-    vec3 _output = vec3(0.f);
-    for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
-        if (pointLights[i].is_active)
-            _output += GetPointLight(pointLights[i]);
-    _output += GetDirectionalLight(dirLight);
-    FragColor = vec4(_output, 1.f);
+	if (isLight)
+	{
+		FragColor = vec4(normal, 1.f);
+		return;
+	}
+
+	vec3 _output = vec3(0.f);
+	for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
+	if (pointLights[i].is_active)
+	    _output += GetPointLight(pointLights[i]);
+	_output += GetDirectionalLight(dirLight);
+	FragColor = vec4(_output, 1.f);
 }

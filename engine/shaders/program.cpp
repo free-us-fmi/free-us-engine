@@ -35,6 +35,9 @@ void program::AddShader(ShaderType type, const std::string& path)
  		case ShaderType::FRAGMENT:
 		internal_shader_type = GL_FRAGMENT_SHADER;
 		break;
+		case ShaderType::GEOMETRY:
+		internal_shader_type = GL_GEOMETRY_SHADER;
+		break;
 		default:
 		std::cout <<  "Error!" << std::endl;
 		break;
@@ -74,7 +77,7 @@ void program::Link()
 void program::Bind()
 {
 	assert(_linked == true);
-	assert( _id != 0 );
 	glUseProgram(_id);
+	glDepthFunc(_depth_test);
 }
 }

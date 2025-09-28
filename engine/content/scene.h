@@ -22,6 +22,8 @@ struct scene
 bool creation_started();
 std::mutex& get_creation_mutex();
 std::unordered_map<std::string, scene>& get_scenes();
+
+void create_empty_scene(const std::string& name);
 void create_scene(const std::string& scene_name, std::string path, bool uv_flipped = false);
 scene* get_scene(const std::string& path);
 

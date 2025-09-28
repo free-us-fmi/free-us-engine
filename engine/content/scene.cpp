@@ -33,6 +33,21 @@ void scene::draw(programs::program* prog, glm::mat4 global_model)
 	}
 }
 
+void create_empty_scene(const std::string& name)
+{
+	std::lock_guard<std::mutex> gl(creation_mutex);
+
+	_creation_started.store(true);
+
+	if ( scenes.find(name) != scenes.end() )
+	{
+		_creation_started.store(false);
+		return;
+	}
+	scenes[name] = {};		
+	_creation_started.store(false);
+}
+
 void create_scene(const std::string& scene_name, std::string path, bool uv_flipped)
 {
 	std::lock_guard<std::mutex> gl(creation_mutex);

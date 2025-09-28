@@ -26,7 +26,7 @@ void framebuffer::add_renderbuffer(const std::string& name, GLenum format, GLenu
 	glGenRenderbuffers(1, &_render_buffers[name]._id);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, _render_buffers[name]._id);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, _width, _height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);	
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, _render_buffers[name]._id);
@@ -39,14 +39,14 @@ void framebuffer::update_renderbuffers()
 	for ( auto buffer : _render_buffers )
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, buffer.second._id);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, _width, _height);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);	
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, buffer.second._attachment, GL_RENDERBUFFER, buffer.second._id);
 	}
 }
 
-void framebuffer::add_texture_2d(const std::string& name, GLenum format, GLenum attachment)
+void framebuffer::add_texture_2d(const std::string& name, GLenum format, GLenum attachment, bool ms)
 {
 	if ( _textures_2d.find(name) != _textures_2d.end() )
 	{
@@ -57,16 +57,23 @@ void framebuffer::add_texture_2d(const std::string& name, GLenum format, GLenum 
 
 	_textures_2d[name]._format = format;
 	_textures_2d[name]._attachment = attachment;
+	_textures_2d[name]._multi_sampling = ms;
+
+
+	GLenum tex_target = ms? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
 	glGenTextures(1, &_textures_2d[name]._id);
-	glBindTexture(GL_TEXTURE_2D, _textures_2d[name]._id);
+	glBindTexture(tex_target, _textures_2d[name]._id);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, GL_UNSIGNED_BYTE, NULL);	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if ( ms )
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, format, _width, _height, GL_TRUE);	
+	else glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, _textures_2d[name]._id, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, tex_target, _textures_2d[name]._id, 0);
 }
 
 void framebuffer::update_textures()
@@ -75,14 +82,19 @@ void framebuffer::update_textures()
 
 	for ( auto& texture : _textures_2d )
 	{
-		glBindTexture(GL_TEXTURE_2D, texture.second._id);
+		bool ms = texture.second._multi_sampling;
+		GLenum tex_target = ms? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, texture.second._format, _width, _height, 0, texture.second._format, GL_UNSIGNED_BYTE, NULL);	
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture.second._id);
+		if ( ms )
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, texture.second._format, _width, _height, GL_TRUE);	
+		else glTexImage2D(GL_TEXTURE_2D, 0, texture.second._format, _width, _height, 0, texture.second._format, GL_UNSIGNED_BYTE, NULL);
+
+		glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, texture.second._attachment, GL_TEXTURE_2D, texture.second._id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, texture.second._attachment, tex_target, texture.second._id, 0);
 	}
 
 }
@@ -137,6 +149,17 @@ void framebuffer::clear()
 	glBindFramebuffer(GL_FRAMEBUFFER, _id);	
 	glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void framebuffer::resolve(unsigned int target)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _id);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 void framebuffer::destroy()
