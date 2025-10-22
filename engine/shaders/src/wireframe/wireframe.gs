@@ -3,6 +3,7 @@
 layout(triangles) in;
 layout(line_strip, max_vertices = 6) out;
 
+out vec4 light_space_pos;
 void main()
 {
 	gl_Position = gl_in[0].gl_Position;

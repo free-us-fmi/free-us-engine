@@ -6,7 +6,7 @@
 namespace editor::geometry 
 {
 
-void update(ecs::entity::entity_id entity_id, programs::program_id program_id)
+void update(ecs::entity::entity_id entity_id)
 {
 	static bool popup = false;
 	static std::string model_path = "";

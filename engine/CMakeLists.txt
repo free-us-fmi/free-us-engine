@@ -5,10 +5,12 @@ add_library(engine STATIC ../glad/src/glad.c
 		application.cpp
 		shaders/shader.cpp
 		shaders/program.cpp
+		shaders/program_uniforms.cpp
 
 		managers/ProgramManager.cpp
 		managers/TextureManager.cpp
 		managers/FramebufferManager.cpp
+		managers/MaterialManager.cpp
 
 		assets/AssetsPath.cpp
 		core/camera.cpp

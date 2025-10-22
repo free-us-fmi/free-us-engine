@@ -4,6 +4,7 @@
 #include "assets/AssetsPath.h"
 #include "editor/content/model_browser.h"
 #include "editor/utility/helpers/progress_bar/progess_popup.h"
+#include "assets/selected_asset_view.h"
 #include "content/scene.h"
 #include <filesystem>
 #include <thread>
@@ -14,6 +15,12 @@ namespace editor::model
 
 namespace {
 	model_browser::model_browser browser;	
+	std::string selected_model = "";
+}
+
+std::string get_selected_model()
+{
+	return selected_model;
 }
 
 void update()
@@ -21,8 +28,13 @@ void update()
 	static bool popup = false;
 	static bool loading = false;
 
-	ImGui::SetNextWindowSize(ImVec2(512, 1024), ImGuiCond_FirstUseEver);
-	ImGui::Begin("models");
+	if ( browser.last_selected_item() != selected_model && !browser.last_selected_is_empty())
+	{
+		std::cout << "selected model " << browser.last_selected_item() << std::endl;
+		selected_model = browser.last_selected_item();
+		selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::models);
+	}
+
 	if ( ImGui::Button("add model") )
 	{
 		popup = true;
@@ -59,12 +71,10 @@ void update()
 			loading = false;
 			helpers::progress::popup::finalize();
 		}
-
 	}
 
 	browser.update();
 
-	ImGui::End();
 }
 
 }

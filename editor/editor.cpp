@@ -3,6 +3,8 @@
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 #include "scene_view.h"
+#include "materials/material_view.h"
+
 #include "ECS/components/selected_entity_view.h"
 #include "content/model_view.h"
 
@@ -13,6 +15,8 @@
 #include "assets/AssetsPath.h"
 #include "managers/TextureManager.h"
 #include "utility/EditorPath.h"
+#include "assets/assets_view.h"
+#include "assets/selected_asset_view.h"
 
 namespace editor 
 {
@@ -37,11 +41,10 @@ void initialize(const editor_init_data& data)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	textures::add_texture(editor::GetEditorPath() + "assets/folder.png");	
-	textures::add_texture(editor::GetEditorPath() + "assets/file.png");	
+	textures::add_texture(editor::GetEditorPath() + "internal_assets/folder.png");	
+	textures::add_texture(editor::GetEditorPath() + "internal_assets/file.png");	
 
 	scene::initialize(data._scene_view_data);
-	selected_entity::initialize(data.program);
 }
 
 void start_frame()
@@ -58,9 +61,9 @@ void start_frame()
 void update()
 {
 	scene::update();
+	assets::update();
 	entity::update();
-	selected_entity::update();
-	model::update();
+	selected_asset::update();
 }
 
 void draw()

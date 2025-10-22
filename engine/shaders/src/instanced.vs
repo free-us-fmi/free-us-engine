@@ -17,6 +17,7 @@ vec3 position;
 
 uniform mat4 projection_view;
 
+out vec4 light_space_pos;
 void main()
 {
 	texCoord = aTexCoord;

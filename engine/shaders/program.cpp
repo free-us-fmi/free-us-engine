@@ -2,14 +2,17 @@
 #include "core/common.h"
 #include <iostream>
 
-namespace programs {
+namespace programs { 
+
+unsigned int program::binded_program = 0;
+
 int program::GetUniformLocation(const std::string& uniform_name) 
 {
-	Bind();
 	auto map_location = _uniform_cache.find(uniform_name);
 	if ( map_location != _uniform_cache.end() )
 		return map_location->second;
 
+	Bind();
 	int location = glGetUniformLocation(_id, uniform_name.c_str());
 	if ( location == -1 )
 		std::cout << "Could not find uniform: " << uniform_name << std::endl;
@@ -77,7 +80,9 @@ void program::Link()
 void program::Bind()
 {
 	assert(_linked == true);
+	program::binded_program = _id;
 	glUseProgram(_id);
+	solve_uniforms();
 	glDepthFunc(_depth_test);
 }
 }

@@ -10,12 +10,12 @@ struct model
 	utl::vector<unsigned int> _meshes;
 	glm::mat4 _local_model;
 
-	void draw(programs::program* prog, glm::mat4 global);
+	void draw(programs::program* prog, glm::mat4 global, bool transparent = false);
 	
+	void set_material(std::string mat);
 	void remove_instance(ecs::entity::entity_id entity_id);
 	void instantiate(ecs::entity::entity_id entity_id);
 };
-
 
 model* get_model(unsigned int id);
 unsigned int add_model(const model& m);

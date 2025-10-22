@@ -9,26 +9,16 @@
 namespace editor::model_browser
 {
 
-void model_browser::initialize()
-{
-	_last_selected_model = "";
-}
 
 void model_browser::update()
 {
 	ImGui::Text("%s", "models");
 	
-	utl::vector<helpers::draw_browser::browser_element> elements;
 	std::unordered_map<std::string, content::scene::scene>& scenes = content::scene::get_scenes();	
-
-	for ( auto& entry : scenes )
-	{	
-		std::string tex = editor::GetEditorPath() + "assets/file.png";
-		elements.push_back({entry.first, tex});	
-	}
-	std::string selected_model = helpers::draw_browser::draw_browser(elements);
-
-	_last_selected_model = selected_model;
+	utl::vector<std::string> scene_names;
+	for ( auto& scene : scenes )
+		scene_names.emplace_back(scene.first);
+	string_browser::browser::update(scene_names);
 }
 
 	

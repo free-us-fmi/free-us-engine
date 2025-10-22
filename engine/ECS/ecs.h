@@ -14,5 +14,6 @@ void remove_entity(entity::entity_id id);
 
 entity::entity* get_entity(entity::entity_id id);
 
+void draw();
 void update();
 }

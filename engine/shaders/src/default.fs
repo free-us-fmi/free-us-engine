@@ -20,10 +20,13 @@ float specular_strength = 1.0;
 
 struct Material
 {
-    float diffuse;
-    sampler2D ambient;
-    sampler2D specular;
-    int shininess;
+	bool has_texture;
+	bool has_specular;	
+
+    	float diffuse;
+    	sampler2D ambient;
+    	sampler2D specular;
+    	int shininess;
 };
 
 uniform Material material;
@@ -66,28 +69,44 @@ struct SpotLight
 
 uniform SpotLight spotLight;
 
+uniform mat4 light_proj;
+
+vec4 tex;
+vec3 specTex;
+
+void get_textures()
+{
+	if ( material.has_texture )
+		tex = texture(material.ambient, texCoord);
+	else tex = vec4(0.8f, 0.8f, 0.8f, 1.f);
+	
+	if ( tex.a < 0.1 )
+		discard;
+
+	if ( material.has_specular )
+		specTex = texture(material.specular, texCoord).xyz;
+	else specTex = vec3(1.f, 1.f, 1.f);
+}
+
 vec3 GetLight(vec3 light_dir, vec3 light_ambient, vec3 light_diffuse, vec3 light_specular)
 {
-    light_dir = normalize(light_dir);
+	light_dir = normalize(light_dir);
 
-    vec3 tex = texture(material.ambient, texCoord).xyz;
-    vec3 specTex = texture(material.specular, texCoord).xyz;
+	vec3 ambient = tex.rgb * light_ambient;
 
-    vec3 ambient = tex * light_ambient;
+	vec3 norm = normalize(normal);
 
-    vec3 norm = normalize(normal);
+	float diff = max(dot(norm, light_dir), 0.0f);
+	vec3 diffuse = diff * light_diffuse * tex.rgb;
 
-    float diff = max(dot(norm, light_dir), 0.0f);
-    vec3 diffuse = diff * light_diffuse * tex;
+	vec3 eyeDir = normalize(eyePos - position);
+	vec3 reflectDir = reflect(-light_dir, norm);
+	float spec = pow(max(dot(reflectDir, eyeDir), 0.f), material.shininess);
+	vec3 specular = spec * specTex * specular_strength * light_specular;
 
-    vec3 eyeDir = normalize(eyePos - position);
-    vec3 reflectDir = reflect(-light_dir, norm);
-    float spec = pow(max(dot(reflectDir, eyeDir), 0.f), material.shininess);
-    vec3 specular = spec * specTex * specular_strength * light_specular;
+	vec3 result = ambient + diffuse + specular;
 
-    vec3 result = ambient + diffuse + specular;
-
-    return result;
+	return result;
 }
 
 vec3 GetDirectionalLight(in DirectionalLight dirLight)
@@ -119,11 +138,25 @@ vec3 GetSpotLight(in SpotLight spotLight)
     else return vec3(0.f, 0.f, 0.f);
 }
 
+
+uniform bool shadowed;
+uniform mat4 light_view;
+uniform sampler2D shadow_map;
+
+in vec4 light_space_pos;
+
+
+
 void main()
 {
+	if ( shadowed )
+		return;
+
 	texCoord = s_in.texCoord;
 	normal = s_in.normal;
 	position = s_in.position;
+	
+	get_textures();
 
 	if (isLight)
 	{
@@ -131,10 +164,24 @@ void main()
 		return;
 	}
 
+	float shadow = 1.f;
+	vec4 light_pos = light_space_pos;
+	light_pos.xyz = light_pos.xyz / light_pos.w;
+	light_pos =  light_pos * 0.5 + 0.5;
+
+	if ( !(light_pos.x < 0.f || light_pos.x > 1.f || light_pos.y < 0.f || light_pos.y > 1.f || light_pos.z < 0.f || light_pos.z > 1.f) )
+	{
+		float light_depth = texture(shadow_map, light_pos.xy).r;
+
+		if ( light_depth + max(0.005 * (1.0 - dot(normal, dirLight.direction)), 0.0005) < light_pos.z )
+			shadow = 0.2f;
+	}
+
+
 	vec3 _output = vec3(0.f);
 	for (int i = 0; i < NUM_POINT_LIGHTS; ++i)
 	if (pointLights[i].is_active)
 	    _output += GetPointLight(pointLights[i]);
 	_output += GetDirectionalLight(dirLight);
-	FragColor = vec4(_output, 1.f);
+	FragColor = vec4(_output * shadow, tex.a);
 }

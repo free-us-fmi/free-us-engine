@@ -13,30 +13,20 @@
 namespace editor::selected_entity 
 {
 
-namespace {
-	programs::program_id program_id;
-}
-
-void initialize(programs::program_id program)
-{
-	program_id = program;
-}
 
 void update()
 {
-	ImGui::Begin("entity view");	
 	ecs::entity::entity_id id = entity::get_selected_entity();
 
 	if ( id == id::invalid_id )
 	{
-		ImGui::End();
 		return;
 	}
 	ecs::entity::entity* _entity = ecs::get_entity(id); 
 	
 	if ( _entity->get_transform() != nullptr )
 		transform::update(_entity->get_transform());
-	geometry::update(id, program_id);
+	geometry::update(id);
 	pointlight::update(_entity->get_point_light());
 
 	static std::string model_path = "";
@@ -85,18 +75,12 @@ void update()
 		{
 			ImGui::CloseCurrentPopup();
 			if ( component == "geometry" )
-				_entity->create_geometry(model_path, program_id);
+				_entity->create_geometry(model_path, model_browser::popup::program_result() );
 			else _entity->create_instanced_geometry(model_path);
 		}
 
 		ImGui::EndPopup();
 	}
-
-
-
-
-
-	ImGui::End();
 }
 
 }

@@ -38,3 +38,8 @@ namespace programs
 {
 	DEFINE_TYPED_ID(program);
 }
+
+namespace materials 
+{
+	DEFINE_TYPED_ID(material);
+}

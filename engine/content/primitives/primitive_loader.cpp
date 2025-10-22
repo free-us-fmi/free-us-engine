@@ -27,7 +27,7 @@ void create_plane(const primitive_data& data, mesh::mesh& m)
 	for ( unsigned int i = 0; i <= x_steps; ++i )
 	{
 		float current_z = -scale;
-		float current_v = 0.f;
+		float current_v = 1.f;
 
 		for ( unsigned int j = 0; j <= z_steps; ++j )
 		{
@@ -38,7 +38,7 @@ void create_plane(const primitive_data& data, mesh::mesh& m)
 			
 			vertices.emplace_back(v);
 
-			current_v += v_step;
+			current_v -= v_step;
 			current_z += z_step;
 		}
 

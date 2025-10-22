@@ -5,7 +5,8 @@
 #include <memory>
 #include "ECS/entity.h"
 #include "content/scene.h"
-
+#include "managers/FramebufferManager.h"
+#include "data/Framebuffer.h"
 struct GLFWwindow;
 
 class application
@@ -26,11 +27,13 @@ private:
 	std::string _texture_specular;
 	std::string _texture_fbo = "*fbo_texture";
 
+
 	utl::vector<programs::program_id> main_programs;
 	programs::program_id prog;
 	programs::program_id instanced_prog;
 
 	unsigned int _FBO;
+	data::framebuffer::framebuffer_id shadows_fbo;
 	GLFWwindow* _window;
 
 	bool _finished = false;

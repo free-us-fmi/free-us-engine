@@ -10,6 +10,8 @@ out S_OUT {
 	vec3 position;
 } vs_out;
 
+out vec4 light_space_pos;
+
 vec2 texCoord;
 vec3 normal;
 vec3 position;
@@ -20,6 +22,7 @@ uniform mat4 normal_model;
 
 uniform float time;
 
+uniform mat4 light_view;
 void main()
 {
 	texCoord = aTexCoord;
@@ -34,6 +37,7 @@ void main()
 
 	position = vec3(model * vec4(position, 1.f));
 	gl_Position = projection_view * vec4(position, 1.0);
+	light_space_pos = light_view * vec4(position, 1.0);
 	normal = normalize(mat3(normal_model) * normal);
 
 	vs_out.texCoord = texCoord;

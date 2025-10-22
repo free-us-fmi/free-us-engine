@@ -1,4 +1,5 @@
 #include "model.h"
+#include "managers/MaterialManager.h"
 
 namespace content::model 
 {
@@ -6,12 +7,12 @@ namespace {
 	utl::vector<model, false> models;
 }
 
-void model::draw(programs::program* prog, glm::mat4 global)
+void model::draw(programs::program* prog, glm::mat4 global, bool transparent)
 {
 	for ( auto c : _meshes )
 	{
 		mesh::mesh* _mesh = mesh::get_mesh(c);
-		_mesh->draw(prog, global * _local_model);
+		_mesh->draw(prog, global * _local_model, transparent);
 	}
 }
 
@@ -34,6 +35,15 @@ void remove_model(unsigned int id)
 	models.erase(models.internal_begin() + id);
 }
 
+
+void model::set_material(std::string mat)
+{
+	for ( auto mesh_id : _meshes )
+	{
+		mesh::mesh* mesh = mesh::get_mesh(mesh_id);
+		mesh->set_material(mat);
+	}
+}
 
 void model::instantiate(ecs::entity::entity_id entity_id)
 {

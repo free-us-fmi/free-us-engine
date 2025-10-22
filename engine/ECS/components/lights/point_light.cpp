@@ -108,10 +108,10 @@ void point_light::internal_update_program(unsigned int id)
 
 	
 	programs::program* prog = programs::GetProgram(id);
-	prog->SetUniform3fv(position_name, glm::value_ptr(_position));
-	prog->SetUniform3fv(ambient_name, glm::value_ptr(_ambient));
-	prog->SetUniform3fv(diffuse_name, glm::value_ptr(_diffuse));
-	prog->SetUniform3fv(specular_name, glm::value_ptr(_specular));
+	prog->SetUniform3fv(position_name, _position);
+	prog->SetUniform3fv(ambient_name, _ambient);
+	prog->SetUniform3fv(diffuse_name, _diffuse);
+	prog->SetUniform3fv(specular_name,_specular);
 	
 	prog->SetUniform1f(constant_name, _constant);
 	prog->SetUniform1f(linear_name, _linear);
@@ -155,7 +155,7 @@ void point_light::set_position(const glm::vec3& position)
 	for ( auto id : _programs)
 	{
 		programs::program* prog = programs::GetProgram(id);
-		prog->SetUniform3fv(position_name, glm::value_ptr(_position));
+		prog->SetUniform3fv(position_name,_position);
 	}
 }
 
@@ -168,7 +168,7 @@ void point_light::set_ambient(const glm::vec3& ambient)
 	for ( auto id : _programs)
 	{
 		programs::program* prog = programs::GetProgram(id);
-		prog->SetUniform3fv(ambient_name, glm::value_ptr(_ambient));
+		prog->SetUniform3fv(ambient_name, _ambient);
 	}
 }
 
@@ -181,7 +181,7 @@ void point_light::set_diffuse(const glm::vec3& diffuse)
 	for ( auto id : _programs)
 	{
 		programs::program* prog = programs::GetProgram(id);
-		prog->SetUniform3fv(diffuse_name, glm::value_ptr(_diffuse));
+		prog->SetUniform3fv(diffuse_name,_diffuse);
 	}
 }
 
@@ -194,7 +194,7 @@ void point_light::set_specular(const glm::vec3& specular)
 	for ( auto id : _programs)
 	{
 		programs::program* prog = programs::GetProgram(id);
-		prog->SetUniform3fv(specular_name, glm::value_ptr(_specular));
+		prog->SetUniform3fv(specular_name,_specular);
 	}
 }
 

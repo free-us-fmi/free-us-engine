@@ -10,6 +10,8 @@
 #include <filesystem>
 #include <fstream>
 #include <format>
+#include "materials/materials.h"
+#include "managers/MaterialManager.h"
 
 namespace content
 {
@@ -73,18 +75,19 @@ void create_and_reister_texture_type(utl::vector<std::string>& tex_vector, aiMat
 	}
 }
 
-mesh::material create_and_register_material(aiMaterial* material,const std::string& path,const aiScene* scene)
+materials::material create_and_register_material(aiMaterial* material,const std::string& path,const aiScene* scene)
 {
-	mesh::material material_data;
+	materials::material material_data;
 
 	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_DIFFUSE, path, scene);
 	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_HEIGHT, path, scene);
 	create_and_reister_texture_type(material_data._specular_map, material, aiTextureType_SPECULAR, path, scene);	
-
+	
+	material_data.editor_visible = false;
 	return material_data;
 }
 
-unsigned int create_and_register_mesh(aiMesh* mesh,utl::vector<mesh::material>& materials)
+unsigned int create_and_register_mesh(const std::string& name, unsigned int mesh_id, aiMesh* mesh,utl::vector<materials::material>& materials)
 {
 	mesh::mesh mesh_data;
 	for ( unsigned int i = 0; i < mesh->mNumVertices; ++i )
@@ -115,11 +118,11 @@ unsigned int create_and_register_mesh(aiMesh* mesh,utl::vector<mesh::material>& 
 
 	assert(mesh->mMaterialIndex < materials.size());
 	
+	std::string mat_name = name + "_" + std::to_string(mesh_id);
+	materials::material_id mat_id = materials::AddMaterial(mat_name, materials[mesh->mMaterialIndex]);
+	mesh_data._material = mat_name;
 
-	mesh_data._material = materials[mesh->mMaterialIndex];
-	
 	unsigned int id = mesh::add_mesh(mesh_data);
-	std::cout << "debug " << id << std::endl;
 	return id;
 }
 
@@ -128,7 +131,7 @@ scene::scene create_scene_from_file(std::string path, bool uv_flipped)
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path.c_str(),aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_ValidateDataStructure | (aiProcess_FlipUVs * uv_flipped));
 	
-	utl::vector<mesh::material> materials;
+	utl::vector<materials::material> materials;
 	std::filesystem::path fp(path);
 	fp.remove_filename();
 
@@ -138,7 +141,7 @@ scene::scene create_scene_from_file(std::string path, bool uv_flipped)
 	utl::vector<unsigned int> mesh_ids;
 	
 	for ( unsigned int i = 0; i < scene->mNumMeshes; ++i )
-		mesh_ids.emplace_back(create_and_register_mesh(scene->mMeshes[i], materials));
+		mesh_ids.emplace_back(create_and_register_mesh(path, i, scene->mMeshes[i], materials));
 
 	scene::scene scene_data;
 	create_scene(scene->mRootNode, mesh_ids, scene_data);

@@ -57,8 +57,12 @@ void remove_entity(entity::entity_id id)
 void update()
 {
 	components::point_light::update();
-	components::geometry::draw();
 	components::instanced_geometry::update_models();
+}
+
+void draw()
+{
+	components::geometry::draw();
 }
 	
 }

@@ -1,6 +1,7 @@
 #include "entity_view.h"
 #include "editor/editor_common.h"
 #include "ECS/ecs.h"
+#include "assets/selected_asset_view.h"
 
 namespace editor::entity 
 {
@@ -17,15 +18,17 @@ ecs::entity::entity_id get_selected_entity()
 void update()
 {
 	auto entities = ecs::get_entity_vector();
-	
-	ImGui::Begin("entities");
 
+	ImGui::Begin("entities");
 	for ( auto& entity : entities )
 	{
 		std::string itemid = "##" + entity.get_name() + "_" + std::to_string(entity.get_id());
 		if ( ImGui::Selectable(itemid.c_str(), entity.get_id() == _selected_entity_id) )
+		{
 			_selected_entity_id = entity.get_id();
-      		ImGui::SameLine();
+			selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::entities);
+		}
+		ImGui::SameLine();
 		ImGui::Text("%s", entity.get_name().c_str());
 	}
 
@@ -35,6 +38,7 @@ void update()
 	}
 
 	ImGui::End();
+
 }
 
 }

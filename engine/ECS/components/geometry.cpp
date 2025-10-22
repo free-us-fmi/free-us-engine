@@ -4,6 +4,11 @@
 #include "ECS/entity.h"
 #include "managers/ProgramManager.h"
 #include "ECS/ecs.h"
+#include "core/camera.h"
+#include "core/GLCommon.h"
+#include "transform.h"
+#include <map>
+
 namespace ecs::components::geometry 
 {
 
@@ -19,7 +24,7 @@ geometry::geometry(entity::entity_id entity, const std::string& model_name,const
 	_name = model_name;
 }
 
-void geometry::draw()
+void geometry::draw(bool shadows, bool transparent)
 {
 	entity::entity* _entity = ecs::get_entity(_entity_id);
 	content::scene::scene* _scene = content::scene::get_scene(_name);	
@@ -35,6 +40,10 @@ void geometry::draw()
 	for ( auto program_id : _program_ids )
 	{
 		programs::program* _program = programs::GetProgram(program_id);
+		
+		//if ( shadows && !_program->is_shadowed() )
+		//	continue;
+
 		_program->Bind();
 
 		if ( _entity->_point_light != id::invalid_id )
@@ -72,10 +81,28 @@ geometry* get_geometry(geometry_id id )
 	return &components[id::index(id)];
 }
 
-void draw()
+void draw(bool shadows)
 {
+	std::map<float, geometry*> transparent_models;
+
 	for ( auto& component : components )
-		component.draw();
+	{
+		if ( content::scene::get_scene(component.get_model_name())->transparent )
+		{
+			glm::vec3 camera_pos = camera::GetCameraPos();
+			components::transform::transform* transform = ecs::get_entity(component.get_entity_id())->get_transform(); 
+			float camera_distance = glm::distance(camera_pos, transform->get_position());
+			transparent_models[camera_distance] =   &component;
+		}
+		else
+			component.draw(shadows);
+	}
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for ( std::map<float, geometry*>::reverse_iterator it = transparent_models.rbegin(); it != transparent_models.rend(); --it )
+		it->second->draw(shadows);
+	glDisable(GL_BLEND);
 }
 
 bool is_valid(geometry_id id)

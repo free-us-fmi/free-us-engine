@@ -36,7 +36,7 @@ void bind_framebuffer()
 
 unsigned int get_framebuffer()
 {
-	return data::framebuffer::GetFramebuffer(_ms_framebuffer_id)->get_id();	
+	return _ms_framebuffer_id;	
 }
 
 void clear()

@@ -5,12 +5,13 @@
 #include "engine/managers/ProgramManager.h"
 #include "engine/utility/vector.h"
 #include <unordered_set>
+
 namespace editor::model_browser::popup
 {
 
 namespace {	
 	
-
+	bool transparent = false;
 	bool initialized = false;
 	std::string selected_model = "";
 	std::unordered_set<std::string> selected_program_names;
@@ -26,7 +27,9 @@ namespace {
 void initialize()
 {
 	initialized = true;
+	transparent = false;
 	selected_model = "";
+	browser.initialize();
 
 	std::unordered_map<std::string, programs::program_id> programs;
 	programs = programs::get_programs();
@@ -35,7 +38,6 @@ void initialize()
 	{
 		selected_program_names.emplace("default");
 	}
-	browser.initialize();
 }
 
 void open()
@@ -72,9 +74,12 @@ void update()
 				else 	selected_program_names.emplace(program.first);
 			}
 		}
+
+		ImGui::Checkbox("transparent", &transparent);
+
 		ImGui::EndChild();
 
-		selected_model = browser.last_selected_model();
+		selected_model = browser.last_selected_item();
 		if ( !browser.last_selected_is_empty() )
 		{
 			ImGui::CloseCurrentPopup();
@@ -83,6 +88,11 @@ void update()
 		ImGui::EndPopup();
 	}
 
+}
+
+bool transparent_result()
+{
+	return transparent;
 }
 
 utl::vector<programs::program_id> program_result()

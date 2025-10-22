@@ -3,6 +3,7 @@
 #include "content_loader.h"
 #include "utility/path.h"
 #include <atomic>
+#include "managers/MaterialManager.h"
 
 namespace content::scene 
 {
@@ -23,13 +24,13 @@ std::unordered_map<std::string, scene>& get_scenes()
 	return scenes;
 }
 
-void scene::draw(programs::program* prog, glm::mat4 global_model)
+void scene::draw(programs::program* prog, glm::mat4 global_model, bool transparent)
 {
 	unsigned int i = 0;
 	for ( auto c : _models )
 	{
 		model::model* m = model::get_model(c);
-		m->draw(prog, global_model);
+		m->draw(prog, global_model, transparent);
 	}
 }
 
@@ -84,6 +85,15 @@ void scene::remove_instance(ecs::entity::entity_id entity_id)
 	{
 		auto model = model::get_model(m);
 		model->remove_instance(entity_id);
+	}
+}
+
+void scene::set_material(std::string mat)
+{
+	for ( auto model_id : _models )
+	{
+		model::model* model = model::get_model(model_id);
+		model->set_material(mat);
 	}
 }
 

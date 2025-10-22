@@ -10,6 +10,8 @@ out S_OUT {
 	vec3 position;
 } vs_out;
 
+out float posx, posz;
+
 vec2 texCoord;
 vec3 normal;
 vec3 position;
@@ -20,6 +22,7 @@ uniform mat4 normal_model;
 
 uniform float time;
 
+out vec4 light_space_pos;
 void main()
 {
 	float R = 4.f;
@@ -27,6 +30,9 @@ void main()
 	texCoord = aTexCoord;
 	
 	float u = (aPos.x + 1.f) * 3.14159, v = (aPos.z + 1.f) * 3.14159;
+	posx = u;
+	posz = v;
+
 	float cos_u = cos(u), sin_u = sin(u);
 	float cos_v = cos(v), sin_v = sin(v);
 	float cos_half_u = cos(u/2), sin_half_u = sin(u/2);

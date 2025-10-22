@@ -15,20 +15,22 @@ public:
 		GLenum _format;
 		GLenum _attachment;
 		unsigned int _id{id::invalid_id};
+		unsigned int _tex_slot;
 	};
 
 	framebuffer(int width, int height);	
 	void clear();
 
 	void add_renderbuffer(const std::string& name, GLenum format, GLenum attachment);
-	void add_texture_2d(const std::string& name, GLenum format, GLenum attachment, bool ms = false);
+	void add_texture_2d(const std::string& name, GLenum format, GLenum attachment, bool ms = false, GLenum type = GL_UNSIGNED_BYTE);
 
 	unsigned int get_texture_2d(const std::string& name);
 	unsigned int get_renderbuffer(const std::string& name);
 
-	void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, _id);}
+	void bind() const;
 
-	void bind_texture(const std::string& name);
+	unsigned int bind_texture(const std::string& name);
+	void unbind_texture(const std::string& name);
 
 	unsigned int get_id() const { return _id; }
 	int get_width() const { return _width; }

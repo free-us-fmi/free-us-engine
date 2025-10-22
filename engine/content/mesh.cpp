@@ -6,7 +6,7 @@
 #include <atomic>
 #include <mutex>
 #include "ECS/ecs.h"
-
+#include "managers/MaterialManager.h"
 namespace content::mesh 
 {
 
@@ -15,31 +15,50 @@ namespace {
 	std::mutex _mutex;
 }
 
-void mesh::draw(programs::program* prog, glm::mat4 model)
+void mesh::draw(programs::program* prog, glm::mat4 model, bool transparent)
 {
 	glBindVertexArray(_VAO);
 
 	glm::mat4 normal_model = glm::transpose(glm::inverse(model));
 
-	prog->SetUniformMatrix4fv("model", false, glm::value_ptr(model));
-	prog->SetUniformMatrix4fv("normal_model", false, glm::value_ptr(normal_model));
+	prog->SetUniformMatrix4fv("model", false, model);
+	prog->SetUniformMatrix4fv("normal_model", false, normal_model);
 
-	textures::unbind_all();
+	materials::material* mat = nullptr;
+	if ( _material != "" )
+		mat = materials::GetMaterial(_material); 
 
-	if ( _material._specular_map.size() )
+	if ( mat && mat->_specular_map.size() )
 	{
-		std::string _texture_specular = _material._specular_map[0];
+		std::string _texture_specular = mat->_specular_map[0];
 		unsigned int tex_specular_slot = textures::bind_texture(_texture_specular);
 		prog->SetUniform1i("material.specular", tex_specular_slot);
+		prog->SetUniform1i("material.has_specular", true);
 	}
-	if ( _material._textures_map.size())
+	else
+		prog->SetUniform1i("material.has_specular", false);
+	if ( mat && mat->_textures_map.size())
 	{
-		std::string _texture = _material._textures_map[0];
+		std::string _texture = mat->_textures_map[0];
 		unsigned int tex_slot = textures::bind_texture(_texture);
 		prog->SetUniform1i("material.ambient", tex_slot);
+		prog->SetUniform1i("material.has_texture", true);
 	}
+	else 
+		prog->SetUniform1i("material.has_texture", false);
 
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, NULL);
+
+	if ( mat && mat->_specular_map.size() )
+	{
+		std::string _texture_specular = mat->_specular_map[0];
+		textures::unbind_one(_texture_specular);
+	}
+	if ( mat && mat->_textures_map.size())
+	{
+		std::string _texture = mat->_textures_map[0];
+		textures::unbind_one(_texture);
+	}
 }
 
 mesh* get_mesh(unsigned int id)
@@ -133,21 +152,41 @@ void mesh::draw_instanced(programs::program* prog)
 	
 	glBindVertexArray(_VAO);
 	prog->Bind();
-	textures::unbind_all();
 
-	if ( _material._specular_map.size() )
+	materials::material* mat = nullptr;
+	if ( _material != "" )
+		mat = materials::GetMaterial(_material); 
+
+	if ( mat && mat->_specular_map.size() )
 	{
-		std::string _texture_specular = _material._specular_map[0];
+		std::string _texture_specular = mat->_specular_map[0];
 		unsigned int tex_specular_slot = textures::bind_texture(_texture_specular);
 		prog->SetUniform1i("material.specular", tex_specular_slot);
-	}
-	if ( _material._textures_map.size())
+		prog->SetUniform1i("material.has_specular", true);
+	} 
+	else
+		prog->SetUniform1i("material.has_specular", false);
+	if ( mat && mat->_textures_map.size())
 	{
-		std::string _texture = _material._textures_map[0];
+		std::string _texture = mat->_textures_map[0];
 		unsigned int tex_slot = textures::bind_texture(_texture);
 		prog->SetUniform1i("material.ambient", tex_slot);
+		prog->SetUniform1i("material.has_texture", true);
 	}
+	else 
+		prog->SetUniform1i("material.has_texture", false);
 	glDrawElementsInstanced(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, NULL, _transforms.size());
+
+	if ( mat && mat->_specular_map.size() )
+	{
+		std::string _texture_specular = mat->_specular_map[0];
+		textures::unbind_one(_texture_specular);
+	}
+	if ( mat && mat->_textures_map.size())
+	{
+		std::string _texture = mat->_textures_map[0];
+		textures::unbind_one(_texture);
+	}
 }
 
 
@@ -211,4 +250,10 @@ void render_instanced(programs::program* prog)
 	for ( auto& mesh : meshes )
 		mesh.draw_instanced(prog);
 }
+
+void mesh::set_material(std::string mat)
+{
+	_material = mat;
+}
+
 }

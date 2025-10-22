@@ -15,7 +15,27 @@ namespace textures
 namespace  {
 	std::unordered_map<std::string, texture_2d> textures;
 	utl::vector<int, false> free_slots;
+
+	unsigned int get_free_slot()
+	{
+		unsigned int slot = free_slots.emplace_tombstone();
+
+		assert( slot < 32 );
+
+		if ( slot >= 32 )
+		{
+			return ~(0);
+		}
+
+		return slot;
+	}
 }
+
+bool exists(const std::string& name)
+{
+	return textures.find(name) != textures.end();
+}
+
 void add_texture(std::string path)
 {
 	if ( textures.find(path) != textures.end() )
@@ -51,18 +71,35 @@ unsigned int bind_texture(std::string path)
 
 
 	texture_2d* texture = &iter->second;
+	
+	unsigned int slot = get_free_slot();
 
-	unsigned int slot = free_slots.emplace_tombstone();
-
-	assert( slot < 32 );
-
-	if ( slot >= 32 )
-	{
-		return ~(0);
-	}
 	texture->bind(slot);	
 	
 	return slot;
+}
+
+unsigned int get_manual_slot()
+{
+	unsigned int slot = get_free_slot();
+	return slot;
+}
+
+void unbind_manual_slot(unsigned int slot)
+{
+	if ( slot >= free_slots.size() or free_slots.is_tombstone(free_slots.internal_begin() + slot) )
+		return;
+	free_slots.erase(free_slots.internal_begin() + slot);
+}
+
+void unbind_one(const std::string& name)
+{
+	if ( textures.find(name) != textures.end() )
+	{
+		unsigned int slot_to_unbind = textures[name].get_slot();
+		textures[name].unbind();
+		free_slots.erase(free_slots.internal_begin() + slot_to_unbind);
+	}
 }
 
 void unbind_all()
@@ -96,18 +133,16 @@ void texture_2d::initialize(std::string path)
 	utl::normalize_path(path);	
 	_path = path;
 
-
 	unsigned char* data = stbi_load((path).c_str(), &width, &height, &channels, 0);
 
 	auto gl_call = [&](){
 
-		glGenTextures(1, &_id);
-				
 		assert(data != nullptr);
 		if ( data == nullptr ){
-			glDeleteTextures(1, &_id);
 			return;
 		}
+
+		glGenTextures(1, &_id);
 
 		GLenum format, internal_format;
 		glBindTexture(GL_TEXTURE_2D, _id);

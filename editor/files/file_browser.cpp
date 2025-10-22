@@ -34,8 +34,8 @@ void file_browser::update()
 
 	for ( const auto& entry : std::filesystem::directory_iterator(_current_path) )
 	{	
-		std::string tex = entry.is_directory()? editor::GetEditorPath() + "assets/folder.png" :
-							editor::GetEditorPath() + "assets/file.png";
+		std::string tex = entry.is_directory()? editor::GetEditorPath() + "internal_assets/folder.png" :
+							editor::GetEditorPath() + "internal_assets/file.png";
 		elements.push_back({entry.path().filename().string(), tex});	
 	}
 	std::filesystem::path selected_path = helpers::draw_browser::draw_browser(elements);

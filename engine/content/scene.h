@@ -5,6 +5,7 @@
 #include "shaders/program.h"
 #include <unordered_map>
 #include <mutex>
+#include "materials/materials.h"
 
 namespace content::scene 
 {
@@ -13,10 +14,13 @@ struct scene
 {
 	utl::vector<unsigned int> _models;	
 
-	void draw(programs::program* prog, glm::mat4 global_model);
-
+	void draw(programs::program* prog, glm::mat4 global_model, bool transparent = false);
+	
+	void set_material(std::string mat);
 	void remove_instance(ecs::entity::entity_id entity_id);
 	void instantiate(ecs::entity::entity_id);
+
+	bool transparent = false;
 };
 
 bool creation_started();
@@ -29,4 +33,6 @@ scene* get_scene(const std::string& path);
 
 void remove_instance(const std::string& path, ecs::entity::entity_id entity_id);
 void instantiate(const std::string& path, ecs::entity::entity_id entity_id);
+
+
 }
