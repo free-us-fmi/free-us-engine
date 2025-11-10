@@ -3,7 +3,7 @@
 
 namespace editor::file_browser::popup
 {
-	void initialize(const std::string& root_path, bool allow_root = false);
+	void initialize(const std::string& root_path, bool allow_root = false, bool directory = false);
 	void update();
 	void open();
 	bool finished();

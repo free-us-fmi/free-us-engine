@@ -2,15 +2,16 @@
 #include <filesystem>
 #include <algorithm>
 #include <regex>
+#include <string>
 
 namespace utl{ 
-void normalize_path(std::string& path)
+void normalize_path(std::filesystem::path& path)
 {
-	std::replace(path.begin(), path.end(),'\\', '/');
+	std::string path_str = path.string();
+	std::replace(path_str.begin(), path_str.end(),'\\', '/');
 	std::regex r("//");
-	path = std::regex_replace(path, r, "/");
-	auto p = std::filesystem::canonical(path);
-	path = p.string();
+	path_str = std::regex_replace(path_str, r, "/");
+	path = std::filesystem::canonical(path_str);
 }
 
 void remove_trailing_separator(std::filesystem::path& path)

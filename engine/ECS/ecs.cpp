@@ -10,7 +10,7 @@ namespace ecs
 
 utl::vector<entity::entity, false, 1024>& get_entity_vector() { return entity_data; }
 
-constexpr bool is_valid(entity::entity_id id )
+bool is_valid(entity::entity_id id )
 {
 	assert(id::is_valid(id));
 	unsigned int index = id::index(id);
@@ -52,6 +52,11 @@ void remove_entity(entity::entity_id id)
 	++ generations[index];
 	
 	entity_data.erase(entity_data.internal_begin() + index);
+}
+
+void unload() {
+	for ( auto& entity : entity_data )
+		remove_entity(entity.get_id());
 }
 
 void update()

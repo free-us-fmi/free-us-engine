@@ -40,6 +40,7 @@ point_light_id create_point_light(entity::entity_id entity)
 void delete_point_light(point_light_id id)
 {
 	assert(id::generation(id) == generations[id::index(id)]);
+	point_lights[id::index(id)].set_active(false);
 	point_lights.erase(point_lights.internal_begin() + id::index(id));
 }
 

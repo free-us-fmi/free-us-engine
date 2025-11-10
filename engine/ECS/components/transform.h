@@ -14,7 +14,7 @@ class transform
 public:
 	friend class entity::entity;
 	
-	transform(entity::entity_id entity);
+	explicit transform(entity::entity_id entity);
 
 	void set_position(const glm::vec3& position);
 	void set_rotation(const glm::vec3& rotation);

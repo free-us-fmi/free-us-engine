@@ -47,7 +47,7 @@ bool application::Initialize()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 16);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	_window = glfwCreateWindow(1600, 900, "fereastra", NULL, NULL);
 
@@ -124,7 +124,7 @@ bool application::Initialize()
 	glLineWidth(2.5f);
 	float radius = 60.0;
 	float offset = 10.f;
-	int amount = 100;
+	int amount = 1;
 	for ( unsigned int i = 0; i < amount; ++i )
 	{	
 		float angle = (float)i / (float)amount * 360.0f;
@@ -226,8 +226,8 @@ void application::Run()
 		program->SetUniformMatrix4fv("projection_view", false,light_projection * light_view);
 		program->SetUniform1f("material.diffuse", 1.f);
 		program->SetUniform1i("material.shininess", 1024);
-		program->SetUniform1f("time", glfwGetTime()); 
-		program->SetUniform1i("shadowed", true); 
+		program->SetUniform1f("time", glfwGetTime());
+		program->SetUniform1i("shadowed", true);
 	}
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT);
@@ -244,8 +244,8 @@ void application::Run()
 		program->SetUniformMatrix4fv("light_view", false,light_projection * light_view);
 		program->SetUniformMatrix4fv("projection_view", false,projection * view);
 		program->SetUniform3fv("eyePos", camera::GetCameraPos());
-		program->SetUniform1i("shadowed", false); 
-		program->SetUniform1i("shadow_map", fbo_slot); 
+		program->SetUniform1i("shadowed", false);
+		program->SetUniform1i("shadow_map", fbo_slot);
 	}
 
 	camera::Update();

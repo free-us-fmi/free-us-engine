@@ -9,6 +9,7 @@
 #include "editor/content/model_popup.h"
 #include "geometry_view.h"
 #include "lights/pointlight_view.h"
+#include "engine/ECS/ecs.h"
 
 namespace editor::selected_entity 
 {
@@ -18,10 +19,9 @@ void update()
 {
 	ecs::entity::entity_id id = entity::get_selected_entity();
 
-	if ( id == id::invalid_id )
-	{
+	if ( !ecs::is_valid(id) )
 		return;
-	}
+
 	ecs::entity::entity* _entity = ecs::get_entity(id); 
 	
 	if ( _entity->get_transform() != nullptr )
@@ -40,6 +40,13 @@ void update()
 		model_browser::popup::initialize();	
 		model_path = "";
 		component = "";
+	}
+
+	ImGui::SameLine();
+	if ( ImGui::Button("Remove") )
+	{
+		ecs::remove_entity(id);
+		return;
 	}
 	
 	static bool model_popup = false;

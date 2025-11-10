@@ -8,6 +8,6 @@ void initialize();
 void update();
 std::string result();
 void open();	
-bool finsihed();
+bool finished();
 
 }

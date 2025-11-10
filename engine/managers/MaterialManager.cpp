@@ -1,5 +1,6 @@
 #include "MaterialManager.h"
 #include "TextureManager.h"
+#include "utility/uid.h"
 
 namespace materials 
 {
@@ -9,18 +10,34 @@ namespace {
 	std::unordered_map<std::string, material_id> materials_map;
 }
 
-material_id AddMaterial(const std::string& name)
-{
-	assert( materials_map.find(name) == materials_map.end());
-	material_id id = materials.emplace_tombstone();
-	materials_map[name] = id;
-	return id;
+bool exists(material_id id) {
+	assert(id < materials.size());
+	return !materials.is_tombstone(materials.internal_begin() + id);
 }
 
-material_id AddMaterial(const std::string& name, const material& mat)
+utl::vector<material, false>& get_materials()
 {
-	material_id id = AddMaterial(name);
-	materials[id] = mat;
+	return materials;
+}
+
+material_id GetMaterialId(const std::string& material_name) {
+	return materials_map[material_name];
+}
+
+material_id AddMaterial(const std::string& name)
+{
+	return AddMaterial(name, utl::uid::get_prefix_uid("mat"));
+}
+
+material_id AddMaterial(const std::string& name, const std::string& uid)
+{
+	if (materials_map.contains(name))
+		return materials_map[name];
+
+	material_id id = materials.emplace_tombstone();
+	materials[id]._name = name;
+	materials[id]._uid = uid;
+	materials_map[name] = id;
 	return id;
 }
 
@@ -33,38 +50,39 @@ material* GetMaterial(material_id id)
 
 material* GetMaterial(const std::string& name)
 {
-	assert( materials_map.find(name) != materials_map.end() );
+	assert( materials_map.contains(name));
 	return GetMaterial(materials_map[name]);
 }
 
-std::unordered_map<std::string, material_id>& get_materials()
-{
-	return materials_map;
+void RemoveMaterial(material_id id) {
+	assert(id < materials.size());
+	if ( !exists(id) )
+		return;
+
+	for ( unsigned int i = 0; i < material::texture_type::count; ++i )
+		change_texture(material::texture_type(i), id, std::filesystem::path());
+	materials_map.erase(materials[id]._name);
+	materials.erase(materials.internal_begin() + id);
 }
 
-void change_diffuse(material_id id, const std::string& texture_name)
+void RemoveMaterial(const std::string& name) {
+	RemoveMaterial(GetMaterialId(name));
+}
+
+void UnloadMaterials() {
+	utl::vector<material_id> ids;
+	for ( auto& material : materials_map )
+		ids.emplace_back(material.second);
+	for ( auto id : ids )
+		RemoveMaterial(id);
+}
+
+void change_texture(material::texture_type type, material_id id, const std::filesystem::path& path)
 {
 	assert(id < materials.size());
 	material* material = GetMaterial(id);
-	material->_textures_map.clear();
 
-	if ( !textures::exists(texture_name) )
-		textures::add_texture(texture_name);
-
-	material->_textures_map.emplace_back(texture_name);
+	material->set_texture(type, path);
 }
-
-void change_specular(material_id id, const std::string& texture_name)
-{
-	assert(id < materials.size());
-	material* material = GetMaterial(id);
-	material->_specular_map.clear();
-
-	if ( !textures::exists(texture_name) )
-		textures::add_texture(texture_name);
-
-	material->_specular_map.emplace_back(texture_name);
-}
-
 
 }

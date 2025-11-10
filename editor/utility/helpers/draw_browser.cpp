@@ -44,7 +44,7 @@ std::string draw_browser(utl::vector<browser_element>& elements)
 
 		textures::texture_2d* tex = textures::get_texture(entry.icon_texture);
 		ImGui::SetCursorPos(ImVec2(posx, posy));
-		ImGui::Image((ImTextureRef)tex->get_id(), ImVec2(icon_size, icon_size), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureRef)tex->get_internal_id(), ImVec2(icon_size, icon_size), ImVec2(0, 1), ImVec2(1, 0));
 
 		next_offsetx += (offset_size + item_separation_size);
 	}

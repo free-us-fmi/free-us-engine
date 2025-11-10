@@ -21,26 +21,29 @@
 #	pragma message("GLM: GLM_EXT_scalar_relational extension included")
 #endif
 
-namespace glm
-{
-	/// @addtogroup ext_scalar_relational
+namespace glm {
+    /// @addtogroup ext_scalar_relational
 	/// @{
 
-	/// Returns the component-wise comparison of |x - y| < epsilon.
+    /// Returns the component-wise comparison of |x - y| < epsilon.
 	/// True if this expression is satisfied.
 	///
 	/// @tparam genType Floating-point or integer scalar types
-	template<typename genType>
-	GLM_FUNC_DECL GLM_CONSTEXPR bool equal(genType const& x, genType const& y, genType const& epsilon);
+    template<typename genType>
+    GLM_FUNC_DECL GLM_CONSTEXPR
 
-	/// Returns the component-wise comparison of |x - y| >= epsilon.
+    bool equal(genType const &x, genType const &y, genType const &epsilon);
+
+    /// Returns the component-wise comparison of |x - y| >= epsilon.
 	/// True if this expression is not satisfied.
 	///
 	/// @tparam genType Floating-point or integer scalar types
-	template<typename genType>
-	GLM_FUNC_DECL GLM_CONSTEXPR bool notEqual(genType const& x, genType const& y, genType const& epsilon);
+    template<typename genType>
+    GLM_FUNC_DECL GLM_CONSTEXPR
 
-	/// Returns the component-wise comparison between two scalars in term of ULPs.
+    bool notEqual(genType const &x, genType const &y, genType const &epsilon);
+
+    /// Returns the component-wise comparison between two scalars in term of ULPs.
 	/// True if this expression is satisfied.
 	///
 	/// @param x First operand.
@@ -48,10 +51,12 @@ namespace glm
 	/// @param ULPs Maximum difference in ULPs between the two operators to consider them equal.
 	///
 	/// @tparam genType Floating-point or integer scalar types
-	template<typename genType>
-	GLM_FUNC_DECL GLM_CONSTEXPR bool equal(genType const& x, genType const& y, int ULPs);
+    template<typename genType>
+    GLM_FUNC_DECL GLM_CONSTEXPR
 
-	/// Returns the component-wise comparison between two scalars in term of ULPs.
+    bool equal(genType const &x, genType const &y, int ULPs);
+
+    /// Returns the component-wise comparison between two scalars in term of ULPs.
 	/// True if this expression is not satisfied.
 	///
 	/// @param x First operand.
@@ -59,10 +64,12 @@ namespace glm
 	/// @param ULPs Maximum difference in ULPs between the two operators to consider them not equal.
 	///
 	/// @tparam genType Floating-point or integer scalar types
-	template<typename genType>
-	GLM_FUNC_DECL GLM_CONSTEXPR bool notEqual(genType const& x, genType const& y, int ULPs);
+    template<typename genType>
+    GLM_FUNC_DECL GLM_CONSTEXPR
 
-	/// @}
-}//namespace glm
+    bool notEqual(genType const &x, genType const &y, int ULPs);
+
+    /// @}
+} //namespace glm
 
 #include "scalar_relational.inl"

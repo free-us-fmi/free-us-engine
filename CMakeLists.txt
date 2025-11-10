@@ -12,6 +12,6 @@ add_subdirectory(assimp)
 add_subdirectory(imgui)
 add_subdirectory(editor)
 add_subdirectory(engine)
+add_subdirectory(serializer)
 add_subdirectory(glfw)
-
-
+add_subdirectory(testing)

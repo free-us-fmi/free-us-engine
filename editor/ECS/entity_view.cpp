@@ -2,6 +2,9 @@
 #include "editor/editor_common.h"
 #include "ECS/ecs.h"
 #include "assets/selected_asset_view.h"
+#include "assimp/contrib/earcut-hpp/earcut.hpp"
+#include "utility/helpers/draw_browser.h"
+#include "utility/helpers/textbox/textbox_popup.h"
 
 namespace editor::entity 
 {
@@ -17,7 +20,9 @@ ecs::entity::entity_id get_selected_entity()
 
 void update()
 {
-	auto entities = ecs::get_entity_vector();
+	static bool creation_popup = false;
+
+	auto& entities = ecs::get_entity_vector();
 
 	ImGui::Begin("entities");
 	for ( auto& entity : entities )
@@ -34,8 +39,18 @@ void update()
 
 	if ( ImGui::Button("Add entity") )
 	{
-		ecs::create_entity();
+		helpers::textbox::popup::initialize("entity name", "add entity");
+		helpers::textbox::popup::open();
+		creation_popup = true;
 	}
+
+	helpers::textbox::popup::update();
+
+	if ( creation_popup && helpers::textbox::popup::finished() ) {
+		creation_popup = false;
+		ecs::create_entity(helpers::textbox::popup::result());
+	}
+
 
 	ImGui::End();
 

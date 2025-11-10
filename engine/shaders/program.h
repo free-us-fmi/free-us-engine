@@ -30,12 +30,12 @@ public:
 	unsigned int  GetId() const { return _id; }
 	bool is_shadowed() const { return _shadowed; }
 	void set_shadowed(bool value) { _shadowed = value; }
+	void set_id(unsigned int id) { _id = id; }
 private:
 
 	static unsigned int binded_program;
 
 	int GetUniformLocation(const std::string& uniform_name);
-	void schedule_uniform_update();
 	void solve_uniforms();
 private:
 	GLenum _depth_test = GL_LESS;	

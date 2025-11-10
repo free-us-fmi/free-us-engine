@@ -23,7 +23,7 @@ namespace
 
 void update()
 {
-	::materials::material_id material_id = materials::get_selected_material_id();
+	std::string material_name = materials::get_selected_material_id();
 
 	ImGui::Text("Diffuse: ");
 	ImGui::SameLine();
@@ -47,16 +47,16 @@ void update()
 		file_browser::popup::update();
 
 	if ( popup == texture_popup_type::diffuse )
-		if ( file_browser::popup::get_selected_file_path() != "" )
+		if ( !file_browser::popup::get_selected_file_path().empty() )
 		{
-			::materials::change_diffuse(material_id, file_browser::popup::get_selected_file_path());
+			::materials::change_texture(::materials::material::texture_type::diffuse, ::materials::GetMaterialId(material_name), file_browser::popup::get_selected_file_path());
 			popup = texture_popup_type::none;
 		}
 	
 	if ( popup == texture_popup_type::specular )
-		if ( file_browser::popup::get_selected_file_path() != "" )
+		if ( !file_browser::popup::get_selected_file_path().empty() )
 		{
-			::materials::change_specular(material_id, file_browser::popup::get_selected_file_path());
+			::materials::change_texture(::materials::material::texture_type::specular, ::materials::GetMaterialId(material_name), file_browser::popup::get_selected_file_path());
 			popup = texture_popup_type::none;
 		}
 }

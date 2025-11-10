@@ -20,13 +20,12 @@ float specular_strength = 1.0;
 
 struct Material
 {
-	bool has_texture;
+	bool has_diffuse;
 	bool has_specular;	
 
-    	float diffuse;
-    	sampler2D ambient;
-    	sampler2D specular;
-    	int shininess;
+    sampler2D diffuse;
+    sampler2D specular;
+    int shininess;
 };
 
 uniform Material material;
@@ -76,8 +75,8 @@ vec3 specTex;
 
 void get_textures()
 {
-	if ( material.has_texture )
-		tex = texture(material.ambient, texCoord);
+	if ( material.has_diffuse )
+		tex = texture(material.diffuse, texCoord);
 	else tex = vec4(0.8f, 0.8f, 0.8f, 1.f);
 	
 	if ( tex.a < 0.1 )
@@ -85,7 +84,7 @@ void get_textures()
 
 	if ( material.has_specular )
 		specTex = texture(material.specular, texCoord).xyz;
-	else specTex = vec3(1.f, 1.f, 1.f);
+	else specTex = vec3(0.3f, 0.3f, 0.3f);
 }
 
 vec3 GetLight(vec3 light_dir, vec3 light_ambient, vec3 light_diffuse, vec3 light_specular)
@@ -173,7 +172,7 @@ void main()
 	{
 		float light_depth = texture(shadow_map, light_pos.xy).r;
 
-		if ( light_depth + max(0.005 * (1.0 - dot(normal, dirLight.direction)), 0.0005) < light_pos.z )
+		if ( light_depth + max(0.05 * (1.0 - dot(normal, dirLight.direction)), 0.005) < light_pos.z )
 			shadow = 0.2f;
 	}
 

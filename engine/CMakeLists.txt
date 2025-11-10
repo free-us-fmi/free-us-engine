@@ -29,6 +29,8 @@ add_library(engine STATIC ../glad/src/glad.c
 		content/scene.cpp 
 		content/primitives/primitive_loader.cpp
 
+		materials/materials.cpp
+
 		data/Framebuffer.cpp
 
 		thread/main_thread_dispatcher.cpp
@@ -46,6 +48,7 @@ target_include_directories(engine PUBLIC ../ )
 target_link_libraries(engine glfw)
 target_link_libraries(engine assimp)
 target_link_libraries(engine imgui)
+target_link_libraries(engine serializer)
 
 find_package(OpenGL REQUIRED)
 

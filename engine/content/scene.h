@@ -14,13 +14,19 @@ struct scene
 {
 	utl::vector<unsigned int> _models;	
 
-	void draw(programs::program* prog, glm::mat4 global_model, bool transparent = false);
+	void draw(programs::program* prog,const glm::mat4& global_model, bool transparent = false);
 	
 	void set_material(std::string mat);
 	void remove_instance(ecs::entity::entity_id entity_id);
 	void instantiate(ecs::entity::entity_id);
 
 	bool transparent = false;
+	std::string name;
+
+	[[nodiscard]] std::string get_uid() const { return _uid; }
+	void set_uid(const std::string& uid) { _uid = uid; }
+private:
+	std::string _uid;
 };
 
 bool creation_started();
@@ -34,5 +40,5 @@ scene* get_scene(const std::string& path);
 void remove_instance(const std::string& path, ecs::entity::entity_id entity_id);
 void instantiate(const std::string& path, ecs::entity::entity_id entity_id);
 
-
+void unload();
 }

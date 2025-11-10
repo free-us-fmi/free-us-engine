@@ -1,7 +1,9 @@
 #pragma once
-#include <string>
+#include <filesystem>
+
 namespace utl {
 
-void normalize_path(std::string& path);
+    void normalize_path(std::filesystem::path& path);
+
 
 }

@@ -20,8 +20,7 @@ void entity::create_transform()
 
 void entity::destroy()
 {
-	if ( components::transform::is_valid(_transform) )
-		components::transform::delete_transform(_transform);
+	components::transform::delete_transform(_transform);
 	remove_point_light();
 	remove_geometry();
 	remove_instanced_geometry();

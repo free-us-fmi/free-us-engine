@@ -15,7 +15,7 @@ namespace {
 	std::mutex _mutex;
 }
 
-void mesh::draw(programs::program* prog, glm::mat4 model, bool transparent)
+void mesh::draw(programs::program* prog,const glm::mat4& model, bool transparent) const
 {
 	glBindVertexArray(_VAO);
 
@@ -25,40 +25,21 @@ void mesh::draw(programs::program* prog, glm::mat4 model, bool transparent)
 	prog->SetUniformMatrix4fv("normal_model", false, normal_model);
 
 	materials::material* mat = nullptr;
-	if ( _material != "" )
-		mat = materials::GetMaterial(_material); 
+	if ( _material != id::invalid_id )
+		mat = materials::GetMaterial(_material);
 
-	if ( mat && mat->_specular_map.size() )
-	{
-		std::string _texture_specular = mat->_specular_map[0];
-		unsigned int tex_specular_slot = textures::bind_texture(_texture_specular);
-		prog->SetUniform1i("material.specular", tex_specular_slot);
-		prog->SetUniform1i("material.has_specular", true);
+	if ( mat ) {
+		mat->bind_uniforms(materials::material::texture_type::diffuse, prog);
+		mat->bind_uniforms(materials::material::texture_type::specular, prog);
 	}
-	else
-		prog->SetUniform1i("material.has_specular", false);
-	if ( mat && mat->_textures_map.size())
-	{
-		std::string _texture = mat->_textures_map[0];
-		unsigned int tex_slot = textures::bind_texture(_texture);
-		prog->SetUniform1i("material.ambient", tex_slot);
-		prog->SetUniform1i("material.has_texture", true);
-	}
-	else 
-		prog->SetUniform1i("material.has_texture", false);
 
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, NULL);
 
-	if ( mat && mat->_specular_map.size() )
-	{
-		std::string _texture_specular = mat->_specular_map[0];
-		textures::unbind_one(_texture_specular);
+	if ( mat ) {
+		mat->unbind_uniforms(materials::material::texture_type::diffuse);
+		mat->unbind_uniforms(materials::material::texture_type::specular);
 	}
-	if ( mat && mat->_textures_map.size())
-	{
-		std::string _texture = mat->_textures_map[0];
-		textures::unbind_one(_texture);
-	}
+
 }
 
 mesh* get_mesh(unsigned int id)
@@ -142,58 +123,41 @@ void remove_mesh(unsigned int id)
 	mesh& m = meshes[id];
 	glDeleteBuffers(1, &m._EBO);
 	glDeleteBuffers(1, &m._VBO);
+	glDeleteVertexArrays(1, &m._VAO);
 	meshes.erase(meshes.internal_begin() + id);
 }
 
-void mesh::draw_instanced(programs::program* prog)
+void mesh::draw_instanced(programs::program* prog) const
 {
-	if ( !_transforms.size() )
+	if ( _transforms.empty() )
 		return;
 	
 	glBindVertexArray(_VAO);
 	prog->Bind();
-
+	prog->SetUniform1i("isLight", false);
 	materials::material* mat = nullptr;
-	if ( _material != "" )
+	if ( _material != id::invalid_id )
 		mat = materials::GetMaterial(_material); 
 
-	if ( mat && mat->_specular_map.size() )
-	{
-		std::string _texture_specular = mat->_specular_map[0];
-		unsigned int tex_specular_slot = textures::bind_texture(_texture_specular);
-		prog->SetUniform1i("material.specular", tex_specular_slot);
-		prog->SetUniform1i("material.has_specular", true);
-	} 
-	else
-		prog->SetUniform1i("material.has_specular", false);
-	if ( mat && mat->_textures_map.size())
-	{
-		std::string _texture = mat->_textures_map[0];
-		unsigned int tex_slot = textures::bind_texture(_texture);
-		prog->SetUniform1i("material.ambient", tex_slot);
-		prog->SetUniform1i("material.has_texture", true);
+	if ( mat ) {
+		mat->bind_uniforms(materials::material::texture_type::diffuse, prog);
+		mat->bind_uniforms(materials::material::texture_type::specular, prog);
 	}
-	else 
-		prog->SetUniform1i("material.has_texture", false);
+
 	glDrawElementsInstanced(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, NULL, _transforms.size());
 
-	if ( mat && mat->_specular_map.size() )
-	{
-		std::string _texture_specular = mat->_specular_map[0];
-		textures::unbind_one(_texture_specular);
+	if ( mat ) {
+		mat->unbind_uniforms(materials::material::texture_type::diffuse);
+		mat->unbind_uniforms(materials::material::texture_type::specular);
 	}
-	if ( mat && mat->_textures_map.size())
-	{
-		std::string _texture = mat->_textures_map[0];
-		textures::unbind_one(_texture);
-	}
+
 }
 
 
 void mesh::instantiate(ecs::entity::entity_id entity_id, const glm::mat4& _local_model)
 {
-	assert ( entity_to_transform.find(entity_id) == entity_to_transform.end() );
-	if ( entity_to_transform.find(entity_id) != entity_to_transform.end() )
+	assert (!entity_to_transform.contains(entity_id));
+	if ( entity_to_transform.contains(entity_id) )
 		return;
 
 	ecs::entity::entity* entity = ecs::get_entity(entity_id);
@@ -215,13 +179,13 @@ void mesh::instantiate(ecs::entity::entity_id entity_id, const glm::mat4& _local
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 16 * _transforms.size(), _transforms.data());
 	}
 	entity_to_transform[entity_id] = _transforms.size() - 1;
-	tranform_to_entity[_transforms.size() - 1] = entity_id;
+	transform_to_entity[_transforms.size() - 1] = entity_id;
 }
 
 void mesh::remove_instance(ecs::entity::entity_id entity_id)
 {
-	assert( entity_to_transform.find(entity_id) != entity_to_transform.end());
-	if ( entity_to_transform.find(entity_id) == entity_to_transform.end() )
+	assert( entity_to_transform.contains(entity_id));
+	if (!entity_to_transform.contains(entity_id) )
 		return;
 
 	ecs::components::transform::transform_id transform_id = entity_to_transform[entity_id];
@@ -232,9 +196,9 @@ void mesh::remove_instance(ecs::entity::entity_id entity_id)
 		_transforms.erase(_transforms.end() - 1);
 		return;
 	}
-	ecs::entity::entity_id entity_to_be_moved = tranform_to_entity[_transforms.size() - 1];
+	ecs::entity::entity_id entity_to_be_moved = transform_to_entity[_transforms.size() - 1];
 	entity_to_transform[entity_to_be_moved] = transform_id;
-	tranform_to_entity[transform_id] = entity_to_be_moved;
+	transform_to_entity[transform_id] = entity_to_be_moved;
 
 	_transforms[transform_id] = _transforms[_transforms.size() - 1];	
 	_transforms.erase(_transforms.internal_end() - 1);
@@ -251,9 +215,13 @@ void render_instanced(programs::program* prog)
 		mesh.draw_instanced(prog);
 }
 
-void mesh::set_material(std::string mat)
+void mesh::set_material(unsigned int mat)
 {
 	_material = mat;
+}
+
+void mesh::set_material(const std::string& mat) {
+	set_material(materials::GetMaterialId(mat));
 }
 
 }

@@ -40,7 +40,7 @@ void geometry::draw(bool shadows, bool transparent)
 	for ( auto program_id : _program_ids )
 	{
 		programs::program* _program = programs::GetProgram(program_id);
-		
+
 		//if ( shadows && !_program->is_shadowed() )
 		//	continue;
 
@@ -48,7 +48,7 @@ void geometry::draw(bool shadows, bool transparent)
 
 		if ( _entity->_point_light != id::invalid_id )
 			_program->SetUniform1i("isLight", true);
-		else 
+		else
 			_program->SetUniform1i("isLight", false);
 
 		_scene->draw(_program, _entity->get_transform()->get_model());
@@ -90,7 +90,7 @@ void draw(bool shadows)
 		if ( content::scene::get_scene(component.get_model_name())->transparent )
 		{
 			glm::vec3 camera_pos = camera::GetCameraPos();
-			components::transform::transform* transform = ecs::get_entity(component.get_entity_id())->get_transform(); 
+			components::transform::transform* transform = ecs::get_entity(component.get_entity_id())->get_transform();
 			float camera_distance = glm::distance(camera_pos, transform->get_position());
 			transparent_models[camera_distance] =   &component;
 		}

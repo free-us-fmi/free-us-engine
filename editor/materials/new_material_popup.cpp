@@ -8,7 +8,7 @@ namespace {
 	
 
 	bool initialized = false;
-	std::string material_name = "";
+	std::string material_name;
 
 	void finalize()
 	{
@@ -55,7 +55,7 @@ std::string result()
 	return material_name;
 }
 
-bool finsihed()
+bool finished()
 {
 	return !initialized;
 }

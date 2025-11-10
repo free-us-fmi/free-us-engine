@@ -2,6 +2,8 @@
 #include <string> 
 #include <filesystem>
 
+#include "core/common.h"
+
 namespace editor::file_browser 
 {
 
@@ -9,6 +11,7 @@ struct editor_init_data
 {
 	std::string _name;
 	std::string _dir_path;
+	bool directory_mode = false;
 };
 
 class file_browser 
@@ -20,6 +23,7 @@ public:
 	void update();
 	
 private:
+	bool _directory_mode = false;
 	bool allow_root = false;
 	std::string _name;
 	std::filesystem::path _root_path;

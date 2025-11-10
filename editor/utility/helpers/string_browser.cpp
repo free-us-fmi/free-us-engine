@@ -1,5 +1,7 @@
 #include "string_browser.h"
 #include <unordered_map>
+
+#include "assets/assets.h"
 #include "utility/helpers/draw_browser.h"
 #include "utility/EditorPath.h"
 
@@ -17,8 +19,8 @@ void browser::update(utl::vector<std::string>& string_elements)
 
 	for ( const auto& entry : string_elements )
 	{	
-		std::string tex = editor::GetEditorPath() + "internal_assets/file.png";
-		elements.push_back({entry, tex});	
+		auto tex = assets::browser_assets::get_texture_id(assets::browser_assets::asset::file);
+		elements.push_back({entry, tex});
 	}
 	std::string selected_model = helpers::draw_browser::draw_browser(elements);
 

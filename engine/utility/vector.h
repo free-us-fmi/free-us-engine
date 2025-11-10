@@ -324,16 +324,26 @@ public:
 			emplace_back(value);
 	}
 
+	[[nodiscard]]
 	constexpr unsigned int size() const
 	{
 		return _size;
 	}
 
+	[[nodiscard]]
+	constexpr unsigned int allocated() const {
+		if constexpr ( disable_tombstoning )
+			return _size;
+		else return _size - _tombstones;
+	}
+
+	[[nodiscard]]
 	constexpr bool empty() const
 	{
 		return _size == 0;
 	}
 
+	[[nodiscard]]
 	constexpr unsigned int capacity() const
 	{
 		return _capacity;
@@ -369,7 +379,7 @@ public:
 	{
 		if ( pos >= _size)
 			std::cout << "error " << pos << " " << _size << std::endl;
-			assert(pos >= 0 && pos < _size );
+		assert(pos >= 0 && pos < _size );
 		if constexpr ( !disable_tombstoning )
 			assert(!is_tombstone(_data + pos));
 		return *(_data + pos);

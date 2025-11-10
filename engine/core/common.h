@@ -43,3 +43,7 @@ namespace materials
 {
 	DEFINE_TYPED_ID(material);
 }
+
+namespace textures {
+	DEFINE_TYPED_ID(texture);
+}

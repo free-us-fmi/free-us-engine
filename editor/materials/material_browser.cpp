@@ -8,13 +8,12 @@ namespace editor::material_browser
 void browser::update()
 {
 	utl::vector<std::string> material_names;
-	std::unordered_map<std::string, materials::material_id>& materials = materials::get_materials();
+	utl::vector<::materials::material, false>& materials = materials::get_materials();
 	
 	for ( auto& material : materials )
-		material_names.emplace_back(material.first);
+		material_names.emplace_back(material._name);
 
 	string_browser::browser::update(material_names);
-
 }
 
 }

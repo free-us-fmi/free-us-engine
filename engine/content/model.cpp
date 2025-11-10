@@ -7,7 +7,7 @@ namespace {
 	utl::vector<model, false> models;
 }
 
-void model::draw(programs::program* prog, glm::mat4 global, bool transparent)
+void model::draw(programs::program* prog,const glm::mat4& global, bool transparent)
 {
 	for ( auto c : _meshes )
 	{
@@ -32,6 +32,9 @@ unsigned int add_model(const model& m)
 void remove_model(unsigned int id)
 {
 	assert( id < models.size() );
+	auto& model = models[id];
+	for ( auto mesh : model._meshes )
+		mesh::remove_mesh(mesh);
 	models.erase(models.internal_begin() + id);
 }
 

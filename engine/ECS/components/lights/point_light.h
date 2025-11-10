@@ -14,7 +14,7 @@ namespace ecs::components::point_light
 class point_light 
 {
 public:
-	point_light(entity::entity_id entity); 
+	explicit point_light(entity::entity_id entity);
 	void initialize(point_light_id id);
 	void update();
 
@@ -51,7 +51,7 @@ private:
 	transform::transform* _transform;
 
 	point_light_id _id{id::invalid_id};
-	std::string parent_light = "";	
+	std::string parent_light;
 	static std::string shader_array_name;
 
 	std::unordered_set<unsigned int> _programs;

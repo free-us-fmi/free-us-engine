@@ -3,8 +3,11 @@
 #include "editor/utility/EditorPath.h"
 #include "managers/TextureManager.h"
 #include <algorithm>
+
+#include "assets/AssetsPath.h"
 #include "editor/utility/helpers/draw_browser.h"
 #include "utility/path.h"
+#include "assets/assets.h"
 
 namespace editor::file_browser 
 {
@@ -16,7 +19,7 @@ void file_browser::initialize(const editor_init_data& init_data,bool allow_root)
 	_name = init_data._name;
 	_last_selected_path = "";
 	_current_path = std::filesystem::path(_root_path);
-
+	_directory_mode = init_data.directory_mode;
 }
 
 void file_browser::update()
@@ -30,22 +33,29 @@ void file_browser::update()
 		_current_path = _current_path.parent_path();
 	}
 
+	if ( _directory_mode && ImGui::Button("select")) {
+		_last_selected_path = _current_path.string();
+	}
+
 	utl::vector<helpers::draw_browser::browser_element> elements;
 
 	for ( const auto& entry : std::filesystem::directory_iterator(_current_path) )
 	{	
-		std::string tex = entry.is_directory()? editor::GetEditorPath() + "internal_assets/folder.png" :
-							editor::GetEditorPath() + "internal_assets/file.png";
-		elements.push_back({entry.path().filename().string(), tex});	
+		textures::texture_id tex = std::filesystem::is_directory(entry.path()) ?
+									assets::browser_assets::get_texture_id(assets::browser_assets::asset::directory) :
+									assets::browser_assets::get_texture_id(assets::browser_assets::asset::file);
+
+		elements.push_back({entry.path().filename().string(), tex});
 	}
 	std::filesystem::path selected_path = helpers::draw_browser::draw_browser(elements);
-	
 
 	if ( std::filesystem::is_directory(_current_path / selected_path))
 	{
 		_current_path /= selected_path;
 	}
 	else _last_selected_path = _current_path / selected_path;
+
+
 }
 
 }

@@ -3,7 +3,7 @@
 
 namespace editor::materials 
 {
-::materials::material_id get_selected_material_id();
+std::string get_selected_material_id();
 void update();
 
 }

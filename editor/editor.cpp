@@ -17,6 +17,8 @@
 #include "utility/EditorPath.h"
 #include "assets/assets_view.h"
 #include "assets/selected_asset_view.h"
+#include "main_bar/main_menu.h"
+#include "assets/assets.h"
 
 namespace editor 
 {
@@ -34,7 +36,7 @@ void initialize(const editor_init_data& data)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	
@@ -44,6 +46,7 @@ void initialize(const editor_init_data& data)
 	textures::add_texture(editor::GetEditorPath() + "internal_assets/folder.png");	
 	textures::add_texture(editor::GetEditorPath() + "internal_assets/file.png");	
 
+	assets::browser_assets::initialize();
 	scene::initialize(data._scene_view_data);
 }
 
@@ -60,6 +63,7 @@ void start_frame()
 
 void update()
 {
+	main_menu::update();
 	scene::update();
 	assets::update();
 	entity::update();

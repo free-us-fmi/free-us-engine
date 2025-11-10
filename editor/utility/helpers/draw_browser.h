@@ -10,7 +10,7 @@ namespace editor::helpers::draw_browser
 struct browser_element 
 {
 	std::string name;
-	std::string icon_texture;
+	textures::texture_id icon_texture;
 };
 
 std::string draw_browser(utl::vector<browser_element>& elements);

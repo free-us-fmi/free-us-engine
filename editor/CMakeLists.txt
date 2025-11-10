@@ -15,6 +15,7 @@ add_executable(editor main.cpp
 		utility/helpers/progress_bar/progess_popup.cpp
 		utility/helpers/progress_bar/progress_bar.cpp
 		utility/helpers/string_browser.cpp
+		utility/helpers/textbox/textbox_popup.cpp
 
 		files/file_popup.cpp
 		files/file_browser.cpp
@@ -32,6 +33,15 @@ add_executable(editor main.cpp
 
 		assets/assets_view.cpp
 		assets/selected_asset_view.cpp
+		assets/assets.cpp
+
+		main_bar/main_menu.cpp
+		main_bar/file/file.cpp
+		main_bar/file/load.cpp
+		main_bar/file/unload.cpp
+		main_bar/file/save_as.cpp
+		main_bar/file/save.cpp
+		main_bar/file/new_project.cpp
 )
 
 target_include_directories(editor PUBLIC ../glfw/include/)
@@ -42,4 +52,5 @@ target_include_directories(editor PUBLIC ../imgui/ )
 target_include_directories(editor PUBLIC ../ )
 
 target_link_libraries(editor engine)
+target_link_libraries(editor serializer)
 

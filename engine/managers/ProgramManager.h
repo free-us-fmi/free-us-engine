@@ -13,4 +13,6 @@ namespace programs
 	program* GetProgram(program_id id);	
 	program* GetProgram(const std::string& name);	
 	std::unordered_map<std::string, program_id>& get_programs();
+	program_id GetProgramId(const std::string& name);
+
 }

@@ -11,23 +11,21 @@ namespace {
 	file_browser browser;	
 	bool initialized = false;
 
-
 	void finalize()
 	{
 		initialized = false;
 	}
 }
 
-void initialize(const std::string& root_path, bool allow_root)
+void initialize(const std::string& root_path, bool allow_root, bool dir)
 {
 	editor_init_data browser_init_data;
 	browser_init_data._name = "select file";
 	browser_init_data._dir_path = root_path;
+	browser_init_data.directory_mode = dir;
 	browser.initialize(browser_init_data, allow_root);
 	
 	initialized = true;
-	
-
 }
 
 void open() 

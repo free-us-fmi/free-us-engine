@@ -18,6 +18,7 @@ program_id AddProgram(const std::string& name)
 {
 	assert( programs_map.find(name) == programs_map.end());
 	program_id id = programs.emplace_tombstone();
+	//programs[id].set_id(id);
 	programs_map[name] = id;
 	return id;
 }
@@ -55,6 +56,11 @@ program* GetProgram(const std::string& name)
 {
 	assert(programs_map.find(name) != programs_map.end());
 	return GetProgram(programs_map[name]);
+}
+
+program_id GetProgramId(const std::string& name) {
+	assert(programs_map.find(name) != programs_map.end());
+	return programs_map[name];
 }
 
 }

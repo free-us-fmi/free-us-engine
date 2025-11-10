@@ -12,6 +12,7 @@
 #include <format>
 #include "materials/materials.h"
 #include "managers/MaterialManager.h"
+#include "utility/uid.h"
 
 namespace content
 {
@@ -35,64 +36,65 @@ void create_scene(aiNode* node, utl::vector<unsigned int>& mesh_ids, scene::scen
 		create_scene(node->mChildren[i], mesh_ids, scene_data);
 }
 
-void create_and_reister_texture_type(utl::vector<std::string>& tex_vector, aiMaterial* material, aiTextureType type, const std::string& dir_path,const aiScene* scene)
+std::filesystem::path create_and_reister_texture_type(aiMaterial* material, aiTextureType type, const std::string& dir_path,const aiScene* scene)
 {
 
-	utl::vector<std::string> _textures;
-	for ( unsigned int i = 0; i < material->GetTextureCount(type); ++i )	
+	if ( !material->GetTextureCount(type))
+		return std::filesystem::path();
+
+	aiString str;
+	material->GetTexture(type, 0, &str);
+
+	std::string path_str(str.C_Str());
+
+	if ( path_str[0] == '*' )
 	{
+		unsigned int id = std::stoi(path_str.substr(1));
+		const aiTexture* texture = scene->mTextures[id];
 
-		aiString str;
-		material->GetTexture(type, i, &str);
+		std::string extension = texture->achFormatHint;
 
-		std::string path(str.C_Str());
-		
-		if ( path[0] == '*' )
+		path_str = std::format("texture_{}.{}", id, extension);
+		path_str = dir_path + path_str;
+
+		std::ofstream File(path_str, std::ios::binary);
+
+		if ( texture->mHeight == 0 )
 		{
-			unsigned int id = std::stoi(path.substr(1));	
-			const aiTexture* texture = scene->mTextures[id];
-
-      			std::string extension = texture->achFormatHint;
-
-			path = std::format("texture_{}.{}", id, extension);	
-			path = dir_path + path;
-
-			std::ofstream File(path, std::ios::binary);
-			
-			if ( texture->mHeight == 0 )
-			{
-				File.write(reinterpret_cast<const char*>(texture->pcData), texture->mWidth);
-				File.close();
-			} else{
-				std::cout << "GLB textures must be compressed!" << std::endl;
-			}
-		} else {
-			path = dir_path + path;
-			utl::normalize_path(path);
+			File.write(reinterpret_cast<const char*>(texture->pcData), texture->mWidth);
+			File.close();
+		} else{
+			std::cout << "GLB textures must be compressed!" << std::endl;
 		}
-		textures::add_texture(path);
-		tex_vector.emplace_back(path);
+	} else {
+		path_str = dir_path + path_str;
+		std::filesystem::path path(path_str);
+		utl::normalize_path(path);
+		path_str = path.string();
 	}
+
+	return path_str;
 }
 
-materials::material create_and_register_material(aiMaterial* material,const std::string& path,const aiScene* scene)
+unsigned int create_and_register_material(aiMaterial* material,const std::string& path,const aiScene* scene, const std::string& name)
 {
-	materials::material material_data;
+	unsigned int mat_id = materials::AddMaterial(name);
+	materials::material* material_data = materials::GetMaterial(name);
 
-	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_DIFFUSE, path, scene);
-	create_and_reister_texture_type(material_data._textures_map, material, aiTextureType_HEIGHT, path, scene);
-	create_and_reister_texture_type(material_data._specular_map, material, aiTextureType_SPECULAR, path, scene);	
+	materials::change_texture(materials::material::texture_type::diffuse, mat_id, create_and_reister_texture_type(material, aiTextureType_HEIGHT, path, scene));
+	materials::change_texture(materials::material::texture_type::diffuse, mat_id, create_and_reister_texture_type(material, aiTextureType_DIFFUSE, path, scene));
+	materials::change_texture(materials::material::texture_type::specular, mat_id, create_and_reister_texture_type(material, aiTextureType_SPECULAR, path, scene));
 	
-	material_data.editor_visible = false;
-	return material_data;
+	material_data->editor_visible = false;
+	return mat_id;
 }
 
-unsigned int create_and_register_mesh(const std::string& name, unsigned int mesh_id, aiMesh* mesh,utl::vector<materials::material>& materials)
+unsigned int create_and_register_mesh(const std::string& name, unsigned int mesh_id, aiMesh* mesh,utl::vector<unsigned int>& materials)
 {
 	mesh::mesh mesh_data;
 	for ( unsigned int i = 0; i < mesh->mNumVertices; ++i )
 	{
-      		vertex vertex_data;
+		vertex vertex_data;
 		vertex_data.position.x = mesh->mVertices[i].x;
 		vertex_data.position.y = mesh->mVertices[i].y;
 		vertex_data.position.z = mesh->mVertices[i].z;
@@ -118,9 +120,7 @@ unsigned int create_and_register_mesh(const std::string& name, unsigned int mesh
 
 	assert(mesh->mMaterialIndex < materials.size());
 	
-	std::string mat_name = name + "_" + std::to_string(mesh_id);
-	materials::material_id mat_id = materials::AddMaterial(mat_name, materials[mesh->mMaterialIndex]);
-	mesh_data._material = mat_name;
+	mesh_data.set_material(materials[mesh->mMaterialIndex]);
 
 	unsigned int id = mesh::add_mesh(mesh_data);
 	return id;
@@ -131,13 +131,13 @@ scene::scene create_scene_from_file(std::string path, bool uv_flipped)
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path.c_str(),aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_ValidateDataStructure | (aiProcess_FlipUVs * uv_flipped));
 	
-	utl::vector<materials::material> materials;
+	utl::vector<unsigned int> materials;
 	std::filesystem::path fp(path);
 	fp.remove_filename();
 
-	for ( unsigned int i = 0; i < scene->mNumMaterials; ++i)
-		materials.emplace_back(create_and_register_material(scene->mMaterials[i], fp.string(), scene));
-
+	for ( unsigned int i = 0; i < scene->mNumMaterials; ++i) {
+		materials.emplace_back(create_and_register_material(scene->mMaterials[i], fp.string(), scene, path + "_" + std::to_string(i)));
+	}
 	utl::vector<unsigned int> mesh_ids;
 	
 	for ( unsigned int i = 0; i < scene->mNumMeshes; ++i )

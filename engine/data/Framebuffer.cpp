@@ -27,7 +27,7 @@ void framebuffer::add_renderbuffer(const std::string& name, GLenum format, GLenu
 	glGenRenderbuffers(1, &_render_buffers[name]._id);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, _render_buffers[name]._id);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 16, GL_DEPTH24_STENCIL8, _width, _height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, _width, _height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);	
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, _render_buffers[name]._id);
@@ -44,7 +44,7 @@ void framebuffer::update_renderbuffers()
 	for ( auto buffer : _render_buffers )
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, buffer.second._id);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 16, GL_DEPTH24_STENCIL8, _width, _height);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, _width, _height);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);	
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, buffer.second._attachment, GL_RENDERBUFFER, buffer.second._id);
@@ -71,7 +71,7 @@ void framebuffer::add_texture_2d(const std::string& name, GLenum format, GLenum 
 	glBindTexture(tex_target, _textures_2d[name]._id);
 
 	if ( ms )
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 16, format, _width, _height, GL_TRUE);	
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, format, _width, _height, GL_TRUE);
 	else glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, type, NULL);
 
 	glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -93,7 +93,7 @@ void framebuffer::update_textures()
 
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture.second._id);
 		if ( ms )
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 16, texture.second._format, _width, _height, GL_TRUE);	
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, texture.second._format, _width, _height, GL_TRUE);
 		else glTexImage2D(GL_TEXTURE_2D, 0, texture.second._format, _width, _height, 0, texture.second._format, GL_UNSIGNED_BYTE, NULL);
 
 		glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );

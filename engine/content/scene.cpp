@@ -4,6 +4,7 @@
 #include "utility/path.h"
 #include <atomic>
 #include "managers/MaterialManager.h"
+#include "utility/uid.h"
 
 namespace content::scene 
 {
@@ -24,7 +25,7 @@ std::unordered_map<std::string, scene>& get_scenes()
 	return scenes;
 }
 
-void scene::draw(programs::program* prog, glm::mat4 global_model, bool transparent)
+void scene::draw(programs::program* prog,const glm::mat4& global_model, bool transparent)
 {
 	unsigned int i = 0;
 	for ( auto c : _models )
@@ -45,7 +46,9 @@ void create_empty_scene(const std::string& name)
 		_creation_started.store(false);
 		return;
 	}
-	scenes[name] = {};		
+	scenes[name] = {};
+	scenes[name].set_uid(utl::uid::get_prefix_uid("scene"));
+
 	_creation_started.store(false);
 }
 
@@ -60,8 +63,18 @@ void create_scene(const std::string& scene_name, std::string path, bool uv_flipp
 		_creation_started.store(false);
 		return;
 	}
-	scenes[scene_name] = create_scene_from_file(path, uv_flipped);		
+	scenes[scene_name] = create_scene_from_file(path, uv_flipped);
+	scenes[scene_name].set_uid(utl::uid::get_prefix_uid("scene"));
+
 	_creation_started.store(false);
+}
+
+
+void unload() {
+	for ( auto& scene : scenes )
+		for ( auto model : scene.second._models )
+			model::remove_model(model);
+	scenes.clear();
 }
 
 scene* get_scene(const std::string& path)
