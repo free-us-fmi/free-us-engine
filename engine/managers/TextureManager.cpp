@@ -164,7 +164,7 @@ void texture_2d::initialize(std::filesystem::path path)
 	utl::normalize_path(path);	
 	std::string uid = utl::uid::get_prefix_uid("tex");
 
-	unsigned char* data = stbi_load((path).c_str(), &width, &height, &channels, 0);
+	unsigned char* data = stbi_load((path).string().c_str(), &width, &height, &channels, 0);
 	serializer::textures::save_to_tmp(uid, data, width, height, channels);
 
 	initialize_from_data(uid, data, width, height, channels);

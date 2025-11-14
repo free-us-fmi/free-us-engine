@@ -10,7 +10,7 @@ namespace serializer::textures {
     void save_to_tmp(const std::string& uid, unsigned char* data, unsigned int width, unsigned int height, unsigned int channels) {
         std::filesystem::path tmp_path = file::temp::get_tmp_path_from_uid(uid);
         writer writer;
-        writer.open(tmp_path);
+        writer.open(tmp_path.string());
 
         //uid
         writer.write(uid);
@@ -33,8 +33,8 @@ namespace serializer::textures {
             return {};
 
         reader reader;
-        reader.open_and_store(tmp_path);
-        file::temp::delete_temporary_file(tmp_path);
+        reader.open_and_store(tmp_path.string());
+        file::temp::delete_temporary_file(tmp_path.string());
         return reader.get_buffer();
     }
 

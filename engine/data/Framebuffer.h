@@ -52,7 +52,7 @@ private:
 	std::unordered_map<std::string, FramebufferBuffer> _textures_2d;
 	int _width, _height;
 
-	glm::vec3 _clear_color = {0.05f, 0.05f, 0.05f};
+	glm::vec3 _clear_color = {0.4f, 0.4f, 0.4f};
 
 	
 };

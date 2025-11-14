@@ -71,7 +71,7 @@ namespace serializer::materials {
                 result[static_cast<::materials::material::texture_type>(i)] = {};
 
             reader reader;
-            reader.open_and_store(existing_path);
+            reader.open_and_store(existing_path.string());
 
             for ( unsigned int i = 0; i < ::materials::material::texture_type::count; ++i ) {
 
@@ -108,7 +108,7 @@ namespace serializer::materials {
                 return detail;
 
             reader reader;
-            reader.open_and_store(existing_path);
+            reader.open_and_store(existing_path.string());
 
             reader.read(detail.name);
 
@@ -135,7 +135,7 @@ namespace serializer::materials {
 
             auto base_path = get_material_path(material._uid, material_base_extension);
 
-            base_writer.open(base_path);
+            base_writer.open(base_path.string());
 
             for ( unsigned int i = 0; i < ::materials::material::texture_type::count; ++i ) {
                 auto texture_type = static_cast<::materials::material::texture_type>(i);
@@ -167,7 +167,7 @@ namespace serializer::materials {
 
             writer detail_writer;
             auto detail_path = get_material_path(material._uid, material_detail_extension);
-            detail_writer.open(detail_path);
+            detail_writer.open(detail_path.string());
             detail_writer.write(material._name);
 
             for ( unsigned int i = 0; i < ::materials::material::texture_type::count; ++i ) {

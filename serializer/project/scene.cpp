@@ -6,7 +6,7 @@
 #include "active_project.h"
 #include "core/serializer.h"
 
-#include "ecs/ecs.h"
+#include "../ecs/ecs.h"
 
 namespace serializer::project::project_scene {
 
