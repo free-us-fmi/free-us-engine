@@ -3,5 +3,5 @@
 
 namespace editor::transform 
 {
-void update(ecs::components::transform::transform* transform);
+void update(ecs::components::transform::transform* transform, const std::string& entity_name);
 }
