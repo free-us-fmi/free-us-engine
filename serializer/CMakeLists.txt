@@ -20,6 +20,9 @@ add_library(serializer STATIC
         ecs/components/instanced_geometry.cpp
         ecs/components/point_light.cpp
         ecs/components/transform.cpp
+
+        shaders/shader.cpp
+
 )
 
 target_include_directories(engine PUBLIC ../ )

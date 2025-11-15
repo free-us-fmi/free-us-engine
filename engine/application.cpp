@@ -19,6 +19,7 @@
 
 #include "imgui.h"
 #include "materials/materials.h"
+#include "raymarcher/renderer.h"
 
 void error_callback(int error, const char* description)
 {	
@@ -63,9 +64,11 @@ bool application::Initialize()
 	int version = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	
 
-	prog = programs::AddProgram("default");
-	instanced_prog = programs::AddProgram("instanced");
-	programs::program_id sin_waves = programs::AddProgram("sin_waves", 
+	prog = programs::AddProgram("default", shaders::GetShadersPath() + "default.vs", shaders::GetShadersPath() + "default.fs");
+	ray_prog = programs::AddProgram("default_ray", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "raymarching/raymarch.fs");
+	instanced_prog = programs::AddProgram("instanced", shaders::GetShadersPath() + "instanced.vs", shaders::GetShadersPath() + "default.fs");
+
+	programs::program_id sin_waves = programs::AddProgram("sin_waves",
 								shaders::GetShadersPath() + "waves/klein.vs",
 						       		shaders::GetShadersPath() + "default.fs"
 						       		);
@@ -73,21 +76,6 @@ bool application::Initialize()
 							shaders::GetShadersPath() + "waves/klein.vs",
 							shaders::GetShadersPath() + "wireframe/wireframe.fs",
 							shaders::GetShadersPath() + "wireframe/wireframe.gs");
-
-	programs::program* _program = programs::GetProgram(prog);
-	programs::program* _instanced_program = programs::GetProgram(instanced_prog);
-
-        _program->AddShader(programs::program::VERTEX,
-                            shaders::GetShadersPath() + "default.vs");
-        _program->AddShader(programs::program::FRAGMENT,
-                            shaders::GetShadersPath() + "default.fs");
-        _program->Link();
-
-        _instanced_program->AddShader(programs::program::VERTEX,
-                            shaders::GetShadersPath() + "instanced.vs");
-        _instanced_program->AddShader(programs::program::FRAGMENT,
-                            shaders::GetShadersPath() + "default.fs");
-        _instanced_program->Link();
 
 	main_programs.emplace_back(sin_waves);
 	main_programs.emplace_back(instanced_prog);
@@ -171,6 +159,8 @@ bool application::Initialize()
 	shadows_fbo = data::framebuffer::AddFramebuffer(2048, 2048);
 	data::framebuffer::framebuffer* sfb = data::framebuffer::GetFramebuffer(shadows_fbo);
 	sfb->add_texture_2d("depth_map", GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT, false, GL_FLOAT);
+
+	raymarching::initialize();
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 
@@ -178,20 +168,10 @@ bool application::Initialize()
 	return true;
 }
 bool first_time = true;
-void application::Run()
-{
-	if ( first_time )
-	{
-		first_time = false;
-		camera::Initialize(_window);
-	}
-	
-	thread::main_thread::update();
+
+void application::render_raster() {
 	programs::program* _program = programs::GetProgram(prog);
 	programs::program* _instanced_program = programs::GetProgram(instanced_prog);
-	if ( glfwWindowShouldClose(_window))
-		_finished = true;
-	
 
 	_program->Bind();
 
@@ -248,7 +228,6 @@ void application::Run()
 		program->SetUniform1i("shadow_map", fbo_slot);
 	}
 
-	camera::Update();
 
 	data::framebuffer::GetFramebuffer(_FBO)->bind();
 
@@ -256,11 +235,38 @@ void application::Run()
 	ecs::draw();
 
 	textures::unbind_all();
+}
+
+namespace {
+	bool raymarched = true;
+}
+
+void set_raymarch(bool value) {
+	raymarched = value;
+}
+
+void application::Run()
+{
+	if ( first_time )
+	{
+		first_time = false;
+		camera::Initialize(_window);
+	}
+
+	camera::Update();
+
+	thread::main_thread::update();
+
+	if ( glfwWindowShouldClose(_window))
+		_finished = true;
+
+	if ( !raymarched )
+		render_raster();
+	else
+		raymarching::render();
 
 	glfwSwapBuffers(_window);
 	glfwPollEvents();
-
-
 }
 
 void application::Finalize()

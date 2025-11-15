@@ -42,6 +42,11 @@ add_executable(editor main.cpp
 		main_bar/file/save_as.cpp
 		main_bar/file/save.cpp
 		main_bar/file/new_project.cpp
+
+		shaders/shader_view.cpp
+		shaders/shader_browser.cpp
+		shaders/selected_shader_view.cpp
+
 )
 
 target_include_directories(editor PUBLIC ../glfw/include/)

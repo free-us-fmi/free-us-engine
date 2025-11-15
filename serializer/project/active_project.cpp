@@ -8,6 +8,8 @@
 #include "serializer/content/scene.h"
 #include "serializer/materials/materials.h"
 #include "scene.h"
+#include "serializer/shaders/shader.h"
+#include "shaders/shader.h"
 
 namespace serializer::project::active {
 
@@ -83,6 +85,7 @@ namespace serializer::project::active {
         }
 
         project_scene::load(project_reader);
+        shaders::load();
 
         file::temp::delete_temporary_files();
     }
