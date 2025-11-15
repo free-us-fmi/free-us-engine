@@ -26,7 +26,7 @@ void file_browser::update()
 {
 	ImGui::Text("%s", _current_path.string().c_str());
 
-	if ( ImGui::Button("back") && (_root_path.compare(_current_path) < 0 || allow_root))
+	if ( ImGui::Button("Back") && (_root_path.compare(_current_path) < 0 || allow_root))
 	{
 #ifdef _WIN32
 		if ( _current_path.string().ends_with('\\'))
@@ -38,8 +38,16 @@ void file_browser::update()
 		_current_path = _current_path.parent_path();
 	}
 
-	if ( _directory_mode && ImGui::Button("select")) {
+	if ( _directory_mode && ImGui::Button("Select")) {
 		_last_selected_path = _current_path.string();
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Cancel"))
+	{
+		_last_selected_path = "";
+		ImGui::CloseCurrentPopup();
 	}
 
 	utl::vector<helpers::draw_browser::browser_element> elements;

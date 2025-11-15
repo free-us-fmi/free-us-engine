@@ -22,23 +22,21 @@ selected_assets_tab get_selected_asset_type()
 
 void update()
 {
-	ImGui::Begin("assets");
+	ImGui::Begin("Assets");
 	
-	ImGui::Text("tabs:");
-	ImGui::SameLine();	
-	if ( ImGui::Button("models") )
-	{
+	ImGui::Text("Tabs:");
+	ImGui::SameLine();
+	if (ImGui::Button("Models", ImVec2(80, 0)))
 		_selected_tab = selected_assets_tab::models;
-	}
 	ImGui::SameLine();
-	if ( ImGui::Button("materials"))
-	{
+	if (ImGui::Button("Materials", ImVec2(80, 0)))
 		_selected_tab = selected_assets_tab::materials;
-	}
 	ImGui::SameLine();
-	if ( ImGui::Button("shaders") ) {
+	if (ImGui::Button("Shaders", ImVec2(80, 0)))
 		_selected_tab = selected_assets_tab::shaders;
-	}
+
+	ImGui::Separator();
+
 
 	ImGui::BeginChild("asset view");
 

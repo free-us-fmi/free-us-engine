@@ -31,7 +31,7 @@ void initialize(const std::string& root_path, bool allow_root, bool dir)
 void open() 
 {
 	ImGui::SetNextWindowSize(ImVec2(512, 512));
-	ImGui::OpenPopup("select file");
+	ImGui::OpenPopup("Select file");
 }
 
 void update()
@@ -39,7 +39,7 @@ void update()
 	if ( !initialized )
 		return;
 
-	if(ImGui::BeginPopupModal("select file") )
+	if(ImGui::BeginPopupModal("Select file") )
 	{
 		browser.update();
 		if ( !browser.last_selected_is_empty() )

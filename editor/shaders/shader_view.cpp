@@ -35,16 +35,24 @@ namespace editor::shaders {
 
         shader_browser.update();
 
-        if (browser_fence != shader_browser.get_fence())
-        {
-            browser_fence = shader_browser.get_fence();
-            selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::shaders);
-        }
 
-        if ( selected_shader != shader_browser.last_selected_item() )
+        float available_height = ImGui::GetContentRegionAvail().y;
+        ImGui::BeginChild("ShaderList", ImVec2(0, available_height), true);
         {
-            selected_shader = shader_browser.last_selected_item();
-            ::raymarching::set_program(selected_shader);
+
+            if (browser_fence != shader_browser.get_fence())
+            {
+                browser_fence = shader_browser.get_fence();
+                selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::shaders);
+            }
+
+            if ( selected_shader != shader_browser.last_selected_item() )
+            {
+                selected_shader = shader_browser.last_selected_item();
+                ::raymarching::set_program(selected_shader);
+            }
+
+            ImGui::EndChild();
         }
     }
 
