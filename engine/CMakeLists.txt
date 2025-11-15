@@ -20,6 +20,7 @@ add_library(engine STATIC ../glad/src/glad.c
 		ECS/components/transform.cpp
 		ECS/components/geometry.cpp
 		ECS/components/instanced_geometry.cpp
+		ECS/components/raymarched_geometry.cpp
 		ECS/ecs.cpp
 		ECS/entity.cpp
 

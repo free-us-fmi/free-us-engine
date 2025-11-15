@@ -35,7 +35,6 @@ namespace editor::shaders {
 
         shader_browser.update();
 
-
         float available_height = ImGui::GetContentRegionAvail().y;
         ImGui::BeginChild("ShaderList", ImVec2(0, available_height), true);
         {

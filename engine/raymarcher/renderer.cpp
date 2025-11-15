@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "core/GLCommon.h"
 #include "data/Framebuffer.h"
+#include "ECS/components/raymarched_geometry.h"
 #include "managers/ProgramManager.h"
 #include "shaders/program.h"
 #include "managers/FramebufferManager.h"
@@ -47,7 +48,7 @@ namespace raymarching {
             program = programs::GetProgram("default_ray");
 
         assert( program->linked() );
-        ecs::components::transform::update_raymarcher();
+        ecs::components::raymarched_geometry::update();
         glBindVertexArray(vao);
         program->Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

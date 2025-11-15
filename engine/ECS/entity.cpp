@@ -24,6 +24,7 @@ void entity::destroy()
 	remove_point_light();
 	remove_geometry();
 	remove_instanced_geometry();
+	remove_raymarched_geometry();
 }
 
 components::transform::transform* entity::get_transform()
@@ -82,5 +83,21 @@ void entity::remove_point_light()
 		components::point_light::delete_point_light(_point_light);
 	_point_light = id::invalid_id;
 }
+
+void entity::create_raymarched_geometry() {
+	_raymarched_geometry = components::raymarched_geometry::create_raymarched_geometry(_id);
+
+}
+void entity::remove_raymarched_geometry() {
+	if ( components::geometry::is_valid(_raymarched_geometry) )
+		components::raymarched_geometry::remove_raymarched_geometry(_raymarched_geometry);
+	_raymarched_geometry = id::invalid_id;
+}
+
+components::raymarched_geometry::raymarched_geometry* entity::get_raymarched_geometry() {
+	return components::raymarched_geometry::get_raymarched_geometry(_raymarched_geometry);
+}
+
+
 
 }

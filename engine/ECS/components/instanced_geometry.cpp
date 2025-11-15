@@ -2,7 +2,7 @@
 #include "content/scene.h"
 #include "ECS/ecs.h"
 #include "utility/assimp_glm.h"
-namespace ecs::components::instanced_geometry 
+namespace ecs::components::instanced_geometry
 {
 
 namespace {

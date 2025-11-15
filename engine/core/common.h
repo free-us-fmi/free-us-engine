@@ -29,6 +29,10 @@ namespace ecs::components::instanced_geometry
 	DEFINE_TYPED_ID(instanced_geometry);
 }
 
+namespace ecs::components::raymarched_geometry {
+	DEFINE_TYPED_ID(raymarched_geometry);
+}
+
 namespace data::framebuffer 
 {
 	DEFINE_TYPED_ID(framebuffer);
