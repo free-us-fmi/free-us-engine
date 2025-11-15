@@ -5,6 +5,7 @@
 #include "materials/selected_material_view.h"
 #include "ECS/components/selected_entity_view.h"
 #include "content/selected_model_view.h"
+#include "shaders/selected_shader_view.h"
 
 namespace editor::selected_asset 
 {
@@ -28,6 +29,8 @@ void update()
 		selected_material::update();
 	else if ( selected_asset_type == last_selected_asset_type::models )
 		selected_model::update();
+	else if ( selected_asset_type == last_selected_asset_type::shaders )
+		selected_shader::update();
 
 	ImGui::End();
 }
