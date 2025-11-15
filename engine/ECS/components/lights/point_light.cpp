@@ -6,6 +6,7 @@
 #include <iostream>
 #include "ECS/entity.h"
 #include "ECS/ecs.h"
+#include "raymarcher/renderer.h"
 
 namespace ecs::components::point_light
 {
@@ -251,4 +252,19 @@ void point_light::set_active(bool value)
 	}
 }
 
+void update_raymarch() {
+	auto* program = programs::GetProgram(raymarching::get_program());
+	if (!program or !program->linked())
+		return;
+	int component_number = 0;
+	for ( auto& component : point_lights ) {
+		auto* transform = ecs::get_entity(component.get_entity_id())->get_transform();
+
+		program->SetUniform3fv("lights[" + std::to_string(component_number) + "].position", transform->get_position());
+		program->SetUniform3fv("lights[" + std::to_string(component_number) + "].color", component.get_ambient());
+		component_number++;
+	}
+	program->SetUniform1i("no_lights", component_number);
+
+}
 }

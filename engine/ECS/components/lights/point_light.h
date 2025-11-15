@@ -42,6 +42,8 @@ public:
 	float get_quadratic() const { return _quadratic; }
 
 	bool get_active() const { return _active;}
+
+	entity::entity_id get_entity_id() const { return _entity_id; }
 private:
 	glm::vec3 get_position() const { return _position; }
 	std::string get_uniform_name(const std::string& var_name) const;
@@ -76,4 +78,5 @@ point_light* get_point_light(point_light_id id);
 
 bool is_valid(point_light_id id);
 void update();
+	void update_raymarch();
 }
