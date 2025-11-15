@@ -4,7 +4,7 @@
 #include "managers/ProgramManager.h"
 #include "shaders/program.h"
 #include "managers/FramebufferManager.h"
-
+#include "ECS/components/transform.h"
 namespace raymarching {
 
     namespace {
@@ -47,6 +47,7 @@ namespace raymarching {
             program = programs::GetProgram("default_ray");
 
         assert( program->linked() );
+        ecs::components::transform::update_raymarcher();
         glBindVertexArray(vao);
         program->Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -54,5 +55,9 @@ namespace raymarching {
 
     void set_program(std::string name) {
         program_name = name;
+    }
+
+    std::string get_program() {
+        return program_name;
     }
 }
