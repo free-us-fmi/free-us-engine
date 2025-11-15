@@ -51,6 +51,10 @@ add_executable(editor main.cpp
 		shaders/shader_browser.cpp
 		shaders/selected_shader_view.cpp
 
+        design_variations/professional_style.h
+		design_variations/professional_style.cpp
+		design_variations/professional_slider.h
+		design_variations/professional_slider.cpp
 )
 
 target_include_directories(editor PUBLIC ../glfw/include/)
