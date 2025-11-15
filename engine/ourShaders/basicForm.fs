@@ -16,6 +16,13 @@ struct object{
 uniform int no_objects;
 uniform object objects[16];
 
+struct light{
+    vec3 direction;
+    vec3 color;
+};
+
+uniform light lights[4];
+uniform int no_lights;
 vec2 iResolution=vec2(1900.f,1800.f);
 float iTime=3;
 
@@ -268,28 +275,30 @@ void main()
         // ambient
         vec3 ambient = vec3(0.1, 0.18, 0.3);
 
-        // layered diffuse colors
-        vec3 layer1 = vec3(0.4, 0.7, 1.0);
-        vec3 layer2 = vec3(0.3, 0.5, 0.8);
-        vec3 layer3 = vec3(0.2, 0.4, 0.6);
-        vec3 layer4 = vec3(0.1, 0.3, 0.5);
-        vec3 layer5 = vec3(0.0, 0.2, 0.4);
+        vec3 diffuseColor = vec3(0.0);
+        diffuseColor += vec3(0.4, 0.7, 1.0) * 0.2;
+        diffuseColor += vec3(0.3, 0.5, 0.8) * 0.2;
+        diffuseColor += vec3(0.2, 0.4, 0.6) * 0.2;
+        diffuseColor += vec3(0.1, 0.3, 0.5) * 0.2;
+        diffuseColor += vec3(0.0, 0.2, 0.4) * 0.2;
 
-        float diff = max(dot(n, l), 0.0);
-        vec3 diffuseColor = layer1 * 0.2
-                          + layer2 * 0.2
-                          + layer3 * 0.2
-                          + layer4 * 0.2
-                          + layer5 * 0.2;
-        vec3 diffuse = diffuseColor * diff * 2.0;
+        // final lighting accumulator
+        vec3 col = ambient;
 
-        // specular
-        float specMultiplier = pow(max(dot(reflect(-l, n), -rd), 0.0), 64.0) * 1.5;
-        vec3 specColor = vec3(1.0) * specMultiplier;
+        for(int i = 0; i < no_lights; i++)
+        {
+            // dir lights: direction *towards* the surface
+            vec3 l = normalize(-lights[i].direction);
 
-        vec3 col = ambient + diffuse + specColor;
+            float diff = max(dot(n, l), 0.0);
+            col += diffuseColor * diff * lights[i].color;
 
-        // simple tonemap / gamma
+            // specular
+            float spec = pow(max(dot(reflect(-l, n), -rd), 0.0), 64.0);
+            col += lights[i].color * spec * 1.5;
+        }
+
+        // tone mapping
         col = pow(col, vec3(1.0/2.2));
 
         FragColor = vec4(col, 1.0);
