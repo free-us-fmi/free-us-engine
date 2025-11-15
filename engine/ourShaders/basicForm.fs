@@ -187,8 +187,7 @@ float distObject(vec3 abspos,object obj){
     pos.yz*=Rot(rotation.x);
     pos.xz*=Rot(rotation.y);
     pos.xy*=Rot(rotation.z);
-    int op=0;
-    switch(op){
+    switch(type){
     case 0:
         return sdEllipsoid(pos,scale);
         
@@ -300,7 +299,8 @@ void main()
 
         // tone mapping
         col = pow(col, vec3(1.0/2.2));
-
+        float spec = pow(max(dot(reflect(-l, n), -rd), 0.0), 64.0);
+        col*=spec;
         FragColor = vec4(col, 1.0);
     }
     else

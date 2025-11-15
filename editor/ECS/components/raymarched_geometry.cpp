@@ -17,7 +17,6 @@ namespace editor::raymarched_geometry
             "tetrahedron",
         };
 
-        static int selected_item = 0;
 
         ::ecs::components::raymarched_geometry::raymarched_geometry* geo = ::ecs::get_entity(entity_id)->get_raymarched_geometry();
         if ( !geo )
@@ -30,6 +29,7 @@ namespace editor::raymarched_geometry
 
         if ( !show_raymarched_geometry_controls )
             return;
+        int selected_item = static_cast<int>(geo->get_model_type());
 
         if (ImGui::Combo("Model type", &selected_item, items, IM_ARRAYSIZE(items)))
             geo->set_model_type(static_cast<::ecs::components::raymarched_geometry::model_types>(selected_item));
