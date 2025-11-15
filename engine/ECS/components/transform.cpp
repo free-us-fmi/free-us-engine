@@ -1,7 +1,9 @@
 #include "transform.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "managers/ProgramManager.h"
 #include "utility/vector.h"
-#include <iostream>
+#include "raymarcher/renderer.h"
+#include "shaders/program.h"
 
 namespace ecs::components::transform
 {
@@ -94,6 +96,19 @@ void transform::set_scale(const glm::vec3& scale)
 void transform::update_model()
 {
 	_model = _position * _rotation * _scale;
+}
+
+void update_raymarcher() {
+	auto* program = programs::GetProgram(raymarching::get_program());
+
+	int component_number = 0;
+	for ( auto& transform : transforms ) {
+		program->SetUniform3fv("models[" + std::to_string(component_number) + "].scale", transform.get_scale());
+		program->SetUniform3fv("models[" + std::to_string(component_number) + "].rotation", transform.get_rotation());
+		program->SetUniform3fv("models[" + std::to_string(component_number) + "].position", transform.get_position());
+		component_number++;
+	}
+	program->SetUniform1i("no_models", component_number);
 }
 
 }

@@ -47,4 +47,5 @@ transform* get_transform(transform_id id );
 
 bool is_valid(transform_id id);
 
+void update_raymarcher();
 }
