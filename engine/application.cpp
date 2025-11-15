@@ -260,7 +260,7 @@ void application::Run()
 	if ( glfwWindowShouldClose(_window))
 		_finished = true;
 
-	if ( !raymarched )
+	if ( raymarched )
 		render_raster();
 	else
 		raymarching::render();
