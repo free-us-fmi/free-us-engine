@@ -21,7 +21,7 @@ void set_selected_asset_type(last_selected_asset_type type)
 
 void update()
 {
-	ImGui::Begin("selected asset");
+	ImGui::Begin("Properties");
 	if (selected_asset_type == last_selected_asset_type::entities )
 		selected_entity::update();
 	else if ( selected_asset_type == last_selected_asset_type::materials )

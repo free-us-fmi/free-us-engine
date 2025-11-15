@@ -10,84 +10,120 @@
 #include "geometry_view.h"
 #include "lights/pointlight_view.h"
 #include "engine/ECS/ecs.h"
+#include "editor/design_variations/professional_style.h"
 
-namespace editor::selected_entity 
+namespace editor::selected_entity
 {
 
+static bool show_component_controls = false;
+static std::string pending_model_path = "";
+static std::string pending_component_type = "";
+static bool model_popup_active = false;
 
 void update()
 {
-	ecs::entity::entity_id id = entity::get_selected_entity();
+    ecs::entity::entity_id id = entity::get_selected_entity();
 
-	if ( !ecs::is_valid(id) )
-		return;
+    if (!ecs::is_valid(id))
+        return;
 
-	ecs::entity::entity* _entity = ecs::get_entity(id); 
-	
-	if ( _entity->get_transform() != nullptr )
-		transform::update(_entity->get_transform());
-	geometry::update(id);
-	pointlight::update(_entity->get_point_light());
+    ecs::entity::entity* _entity = ecs::get_entity(id);
 
-	static std::string model_path = "";
-	static std::string component = "";
+    if (_entity->get_transform() != nullptr)
+        transform::update(_entity->get_transform(), _entity->get_name());
+    geometry::update(id);
+    pointlight::update(_entity->get_point_light());
 
-	if ( ImGui::Button("Add component") )
-	{
-		ImGui::SetNextWindowSize(ImVec2(256, 256));
-		ImGui::OpenPopup("Add component");
-		
-		model_browser::popup::initialize();	
-		model_path = "";
-		component = "";
-	}
+    //PS
+    editor::professional_style::ApplyProfessionalStyle();
 
-	ImGui::SameLine();
-	if ( ImGui::Button("Remove") )
-	{
-		ecs::remove_entity(id);
-		return;
-	}
-	
-	static bool model_popup = false;
+    ImGui::Spacing();
 
-	if ( ImGui::BeginPopupModal("Add component") )
-	{
-		if ( ImGui::Button("geometry"))
-		{
-			component = "geometry";
-			model_popup = true;
-			model_browser::popup::open();
-		}
+    //component management section
+    if (ImGui::Selectable("Component Management", show_component_controls, ImGuiSelectableFlags_None, ImVec2(0, 15)))
+    {
+        show_component_controls = !show_component_controls;
+    }
 
-		if ( ImGui::Button("instanced geometry"))
-		{
-			component = "instanced geometry";
-			model_popup = true;
-			model_browser::popup::open();
-		}
+    if (show_component_controls)
+    {
+        ImGui::Spacing();
+        ImGui::Spacing();
 
-		if ( ImGui::Button("point light"))
-		{
-			component = "point light";
-			_entity->create_point_light();
-			ImGui::CloseCurrentPopup();
-		}
+        if (ImGui::Selectable("Add Component"))
+        {
+            ImGui::SetNextWindowSize(ImVec2(256, 256));
+            ImGui::OpenPopup("Add component");
+            model_browser::popup::initialize();
+            pending_model_path = "";
+            pending_component_type = "";
+            model_popup_active = false; // RESET POPUP STATE
+        }
 
-		if ( model_popup)
-			model_browser::popup::update();
-		model_path = model_browser::popup::result();
+        if (ImGui::Selectable("Remove Entity"))
+        {
+            ecs::remove_entity(id);
+            editor::professional_style::RestoreStyle();
+            return;
+        }
 
-		if ( model_path != "" )
-		{
-			ImGui::CloseCurrentPopup();
-			if ( component == "geometry" )
-				_entity->create_geometry(model_path, model_browser::popup::program_result() );
-			else _entity->create_instanced_geometry(model_path);
-		}
+        ImGui::Spacing();
+    }
 
-		ImGui::EndPopup();
-	}
+    ImGui::Separator();
+    editor::professional_style::RestoreStyle();
+
+    if (ImGui::BeginPopupModal("Add component"))
+    {
+        if (ImGui::Button("geometry"))
+        {
+            pending_component_type = "geometry";
+            model_popup_active = true;
+            model_browser::popup::open();
+        }
+
+        if (ImGui::Button("instanced geometry"))
+        {
+            pending_component_type = "instanced geometry";
+            model_popup_active = true;
+            model_browser::popup::open();
+        }
+
+        if (ImGui::Button("point light"))
+        {
+            pending_component_type = "point light";
+            _entity->create_point_light();
+            pending_component_type = "";
+            model_popup_active = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (model_popup_active)
+        {
+            model_browser::popup::update();
+            pending_model_path = model_browser::popup::result();
+        }
+
+        if (!pending_model_path.empty())
+        {
+            ImGui::CloseCurrentPopup();
+
+            if (pending_component_type == "geometry")
+            {
+                _entity->create_geometry(pending_model_path, model_browser::popup::program_result());
+            }
+            else if (pending_component_type == "instanced geometry")
+            {
+                _entity->create_instanced_geometry(pending_model_path);
+            }
+
+            pending_model_path = "";
+            pending_component_type = "";
+            model_popup_active = false;
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 }
