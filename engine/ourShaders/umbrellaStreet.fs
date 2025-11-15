@@ -48,6 +48,56 @@ float sdBox(vec3 p, vec3 b){
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+
+//----------------------------------------------------------
+//Baston SDF
+//----------------------------------------------------------
+float sdCappedCylinder(vec3 p, float h, float r) 
+{
+    vec2 d = abs(vec2(length(p.xz), p.y)) - vec2(r, h);
+    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0));
+}
+
+float sdCappedTorus(vec3 p, vec2 sc, float ra, float rb)
+{
+    p.x = abs(p.x);
+    float k = (sc.y*p.x>sc.x*p.y) ? dot(p.xy,sc) : length(p.xy);
+    return sqrt(dot(p,p) + ra*ra - 2.0*ra*k) - rb;
+}
+
+float sdBaston(vec3 p)
+{
+
+    float s=0.3;
+    vec3 q=p/s;
+
+     // --- Flip upside down (180° around X axis) ---
+    q.yz = mat2(-1.0, 0.0,0.0, -1.0) * q.yz;
+               
+
+    float torusHeight = 0.5;
+    float torusRadius = 0.4;
+    float torusThickness = 0.13;
+
+    // ---- Torus ----
+    vec3 pt = q - vec3(0.15, torusHeight+1.42, 0.0);
+    float head = sdCappedTorus(pt, vec2(0.955, 0.3), torusRadius, torusThickness);
+
+    // ---- Cylinder attached to side of torus ----
+    float attachX = torusRadius + torusThickness; // position at rim
+    vec3 ph = q - vec3(attachX, torusHeight, 0.0);
+    float handle = sdCappedCylinder(ph, 1.4, 0.15);
+
+    // ---- Smooth Union ----
+    float k = 0.20;
+    float h = clamp(0.5 + 0.5 * (handle - head) / k, 0.0, 1.0);
+    
+     float r=mix(handle, head, h) - k * h * (1.0 - h);
+
+    return r*s;
+}
+
+
 // ---------------------------------------------------------
 // Umbrella SDF
 // ---------------------------------------------------------
@@ -61,8 +111,14 @@ float sdUmbrella(vec3 p){
 
     float negSphere = sdSphere(p+vec3(0.,.35,0.),0.8);
     final = max(-negSphere, final);
+    //
+    //sus jos
+    //last param -> fata spate
+    vec3 pMoved = p - vec3(-0.17, 0.0, 0.05);
+    float baston = sdBaston(pMoved);
+    //float baston=sdBaston(p);
 
-    return final;
+    return min(final,baston);
 }
 
 // ---------------------------------------------------------
