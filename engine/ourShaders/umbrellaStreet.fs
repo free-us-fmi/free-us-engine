@@ -1,4 +1,4 @@
-#version 450 core
+﻿#version 450 core
 
 out vec4 FragColor;
 
@@ -71,7 +71,7 @@ float sdBaston(vec3 p)
     float s=0.3;
     vec3 q=p/s;
 
-     // --- Flip upside down (180� around X axis) ---
+     // --- Flip upside down (180° around X axis) ---
     q.yz = mat2(-1.0, 0.0,0.0, -1.0) * q.yz;
                
 
@@ -174,6 +174,10 @@ vec3 getNormal(vec3 p){
     );
 }
 
+float noise(vec3 p){
+    return fract(sin(dot(p, vec3(12.9898,78.233,37.719)))*43758.5453);
+}
+
 // ---------------------------------------------------------
 // Shading
 // ---------------------------------------------------------
@@ -199,8 +203,27 @@ vec3 shade(vec3 ro, vec3 rd)
 
     vec3 col;
     if (matID==1){
-        col = mix(vec3(0.5,0.5,0.6), vec3(0.1,0.12,0.15), .2);
-        col += 0.7*spec;
+       
+        vec3 n = getNormal(p);
+
+        // Horizontal surfaces → street
+        float groundMask = smoothstep(0.9, 1.0, n.y); // 1 on flat ground, 0 on walls
+
+        // Street color
+        vec3 streetColor = vec3(0.76, 0.70, 0.50); // light brown
+
+        // Optional subtle hex pattern or noise
+        float grain = noise(p*5.0)*0.05;
+        vec3 groundColor = streetColor + grain;
+
+        // Wall color
+        vec3 wallColor = vec3(0.55, 0.2, 0.15); // reddish brick
+
+        // Mix based on surface orientation
+        col = mix(wallColor, groundColor, groundMask);
+
+
+    
     }
     else {
         float h = fract(float(matID)*0.17);

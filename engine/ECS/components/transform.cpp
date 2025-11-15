@@ -100,7 +100,7 @@ void transform::update_model()
 
 void update_raymarcher() {
 	auto* program = programs::GetProgram(raymarching::get_program());
-	if (!program)
+	if (!program or !program->linked())
 		return;
 	int component_number = 0;
 	for ( auto& transform : transforms ) {
