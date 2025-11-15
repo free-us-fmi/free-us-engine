@@ -1,0 +1,159 @@
+// ---- Utility: Smooth Union ----
+float smoothUnion(float d1, float d2, float k)
+{
+    float h = clamp(0.5 + 0.5*(d2 - d1)/k, 0.0, 1.0);
+    return mix(d2, d1, h) - k*h*(1.0-h);
+}
+
+
+// ---- Basic Capped Cylinder ----
+float sdCappedCylinder(vec3 p, float h, float r) 
+{
+    vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h); 
+    return min(max(d.x,d.y),0.0) + length(max(d,0.0)); 
+}
+
+
+// -------- Hexagonal Cone with Rounded Top --------
+float sdHexConeRounded(vec3 p, float r0, float r1, float h, float roundTip)
+{
+    // move shape down so base is centered
+    p.y -= h*0.5;
+
+    float y = clamp((p.y + h*0.5) / h, 0.0, 1.0);
+    float k = mix(r0, r1, y);
+
+    // hex projection
+    vec2 q = abs(p.xz);
+    const vec2 khex = vec2(-0.8660254, 0.5);
+    q -= 2.0 * min(dot(khex, q), 0.0) * khex;
+
+    float dHex = max(q.x, q.y * 0.57735) - k;
+    float dY = abs(p.y) - h*0.5;
+
+    float d = max(dHex, dY);
+
+    // ROUND the tip (umbrella effect)
+    float tipDist = length(vec2(dHex, p.y - h*0.5)) - roundTip;
+
+    // use smooth min for blending tip
+    float kSmooth = 0.1; // softness of rounding
+    float smoothMin = -log(exp(-tipDist/kSmooth) + exp(-d/kSmooth))*kSmooth;
+
+    return smoothMin;
+}
+
+
+
+// -------- Scene SDF: Pole + Lamp Head --------
+float mapScene(vec3 p)
+{
+    // rotate the lamp slowly
+    float t = iTime * 0.4;
+    float cs = cos(t), sn = sin(t);
+    p.xz = mat2(cs, -sn, sn, cs) * p.xz;
+
+    // ----- Lamp pole (tall cylinder) -----
+    vec3 poleP = p;
+    float pole = sdCappedCylinder(poleP, 3.0, 0.07);
+
+    // ----- Lamp head positioned on top -----
+    vec3 headP = p - vec3(0.0, 3.0, 0.0);
+    float head = sdHexConeRounded(headP, 0.6, 0.05, 0.8, 0.12);
+
+    // ----- Base cone at bottom -----
+    vec3 baseConeP = p - vec3(0.0, -3.0, 0.0); // slightly below the pole
+    float baseCone = sdHexConeRounded(baseConeP, 0.5, 0.05, 0.3, 0.05);
+
+    // Combine everything
+    float lampBody = smoothUnion(pole, head, 0.12);
+    lampBody = smoothUnion(lampBody, baseCone, 0.08);
+
+    return lampBody;
+}
+
+
+
+
+// -------- Normal Calculation --------
+// -------- Lighting --------
+vec3 getNormal(vec3 p)
+{
+    const float e = 0.001;
+    return normalize(vec3(
+        mapScene(p + vec3(e,0,0)) - mapScene(p - vec3(e,0,0)),
+        mapScene(p + vec3(0,e,0)) - mapScene(p - vec3(0,e,0)),
+        mapScene(p + vec3(0,0,e)) - mapScene(p - vec3(0,0,e))
+    ));
+}
+
+// -------- Raymarch --------
+float raymarch(vec3 ro, vec3 rd)
+{
+    float t = 0.0;
+    for(int i=0;i<120;i++)
+    {
+        vec3 p = ro + rd * t;
+        float d = mapScene(p);
+        if(d < 0.001) return t;
+        t += d;
+        if(t > 20.0) break;
+    }
+    return -1.0;
+}
+
+
+
+// -------- Main --------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    // Camera setup
+    vec3 ro = vec3(0.0, 0.4, 12.5);
+    vec3 rd = normalize(vec3(uv, -1.5));
+
+    float t = raymarch(ro, rd);
+
+    if(t > 0.0)
+    {
+        vec3 lightPos = vec3(2.0, 3.0, 2.0);
+        vec3 p = ro + rd * t;
+        vec3 n = getNormal(p);
+        vec3 l = normalize(lightPos - p);
+
+        //ambient
+        vec3 ambient = vec3(0.1,0.18,0.3);
+        
+        //diffuse
+        vec3 layer1 = vec3(0.4, 0.7, 1.0);
+        vec3 layer2 = vec3(0.3, 0.5, 0.8);
+        vec3 layer3 = vec3(0.2, 0.4, 0.6);
+        vec3 layer4 = vec3(0.1, 0.3, 0.5);
+        vec3 layer5 = vec3(0.0, 0.2, 0.4);
+        
+        
+        
+        float diff=max(dot(n,l),0.0);
+        vec3 diffuseColor = layer1 * diff * 0.2
+                  + layer2 * diff * 0.2
+                  + layer3 * diff * 0.2
+                  + layer4 * diff * 0.2
+                  + layer5 * diff * 0.2;
+        vec3 diffuse=diffuseColor*diff*2.0;
+        
+        
+        //specular
+        float specMultiplier = pow(max(dot(reflect(-l,n),-rd),0.0),64.0)*1.5;
+        vec3 specColor=vec3(1.0)*specMultiplier;
+        
+      
+        vec3 col = ambient + diffuse  + specColor;
+        fragColor = vec4(col, 1.0);
+
+    }
+    else
+    {
+        fragColor = vec4(0.02, 0.02, 0.03, 1.0);
+    }
+}
