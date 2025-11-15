@@ -32,6 +32,7 @@ public:
 	void set_id(unsigned int id) { _id = id; }
 
 	bool _editor_visible = false;
+	bool _unloadable = true;
 private:
 
 	static unsigned int binded_program;

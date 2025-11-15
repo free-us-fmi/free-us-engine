@@ -66,6 +66,12 @@ bool application::Initialize()
 
 	prog = programs::AddProgram("default", shaders::GetShadersPath() + "default.vs", shaders::GetShadersPath() + "default.fs");
 	ray_prog = programs::AddProgram("default_ray", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "raymarching/raymarch.fs");
+	programs::AddProgram("umbrella", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/umbrellaStreet.fs");
+	programs::GetProgram("umbrella")->_editor_visible = true;
+	programs::GetProgram("umbrella")->_unloadable = false;
+	programs::AddProgram("basicGeometricForms", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/basicForms.fs");
+	programs::GetProgram("basicGeometricForms")->_editor_visible = true;
+	programs::GetProgram("basicGeometricForms")->_unloadable = false;
 	instanced_prog = programs::AddProgram("instanced", shaders::GetShadersPath() + "instanced.vs", shaders::GetShadersPath() + "default.fs");
 
 	programs::program_id sin_waves = programs::AddProgram("sin_waves",
@@ -260,7 +266,7 @@ void application::Run()
 	if ( glfwWindowShouldClose(_window))
 		_finished = true;
 
-	if ( raymarched )
+	if ( !raymarched )
 		render_raster();
 	else
 		raymarching::render();

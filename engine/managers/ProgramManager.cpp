@@ -78,7 +78,7 @@ program_id GetProgramId(const std::string& name) {
 
 void unload() {
 	for ( unsigned int i = 0; i < programs.size(); i++ ) {
-		if ( !programs.is_tombstone(programs.internal_begin() + i) && programs[i]._editor_visible ){
+		if ( !programs.is_tombstone(programs.internal_begin() + i) && programs[i]._editor_visible && programs[i]._unloadable) {
 			programs_map.erase(programs[i].get_name());
 			programs.erase(programs.internal_begin() + i);
 		}
