@@ -260,7 +260,7 @@ void update_raymarch() {
 	for ( auto& component : point_lights ) {
 		auto* transform = ecs::get_entity(component.get_entity_id())->get_transform();
 
-		program->SetUniform3fv("lights[" + std::to_string(component_number) + "].position", transform->get_position());
+		program->SetUniform3fv("lights[" + std::to_string(component_number) + "].direction", transform->get_position());
 		program->SetUniform3fv("lights[" + std::to_string(component_number) + "].color", component.get_ambient());
 		component_number++;
 	}

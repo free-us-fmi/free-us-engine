@@ -5,7 +5,7 @@
 #include "managers/ProgramManager.h"
 #include "shaders/program.h"
 #include "managers/FramebufferManager.h"
-#include "ECS/components/transform.h"
+#include "ECS/components/lights/point_light.h"
 namespace raymarching {
 
     namespace {
@@ -49,6 +49,7 @@ namespace raymarching {
 
         assert( program->linked() );
         ecs::components::raymarched_geometry::update();
+        ecs::components::point_light::update_raymarch();
         glBindVertexArray(vao);
         program->Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

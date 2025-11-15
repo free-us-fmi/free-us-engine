@@ -269,7 +269,7 @@ void main()
         vec3 lightPos = vec3(2.0, 3.0, 2.0);
         vec3 p = ro + rd * tHit;
         vec3 n = getNormal(p);
-        vec3 l = normalize(lightPos - p);
+        //vec3 n = normalize(lightPos - p);
 
         // ambient
         vec3 ambient = vec3(0.1, 0.18, 0.3);
@@ -289,18 +289,13 @@ void main()
             // dir lights: direction *towards* the surface
             vec3 l = normalize(-lights[i].direction);
 
-            float diff = max(dot(n, l), 0.0);
-            col += diffuseColor * diff * lights[i].color;
-
-            // specular
-            float spec = pow(max(dot(reflect(-l, n), -rd), 0.0), 64.0);
-            col += lights[i].color * spec * 1.5;
+            float diff = max(dot(n,l), 0.0);
+            col += diff * lights[i].color;
         }
 
         // tone mapping
-        col = pow(col, vec3(1.0/2.2));
-        float spec = pow(max(dot(reflect(-l, n), -rd), 0.0), 64.0);
-        col*=spec;
+       // col = pow(col, vec3(1.0/2.2));
+        
         FragColor = vec4(col, 1.0);
     }
     else

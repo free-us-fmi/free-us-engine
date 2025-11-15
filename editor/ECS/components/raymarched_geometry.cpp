@@ -34,8 +34,5 @@ namespace editor::raymarched_geometry
         if (ImGui::Combo("Model type", &selected_item, items, IM_ARRAYSIZE(items)))
             geo->set_model_type(static_cast<::ecs::components::raymarched_geometry::model_types>(selected_item));
 
-        if (ImGui::Combo("Model type", &selected_item, items, IM_ARRAYSIZE(items)))
-            geo->set_model_type(static_cast<::ecs::components::raymarched_geometry::model_types>(selected_item));
-
     }
 }
