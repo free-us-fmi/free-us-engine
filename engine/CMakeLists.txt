@@ -11,6 +11,7 @@ add_library(engine STATIC ../glad/src/glad.c
 		managers/TextureManager.cpp
 		managers/FramebufferManager.cpp
 		managers/MaterialManager.cpp
+		managers/ShaderManager.cpp
 
 		assets/AssetsPath.cpp
 		core/camera.cpp
@@ -35,7 +36,8 @@ add_library(engine STATIC ../glad/src/glad.c
 
 		thread/main_thread_dispatcher.cpp
 
- )
+		raymarcher/renderer.cpp
+)
 
 
 target_include_directories(engine PUBLIC ../glfw/include/)

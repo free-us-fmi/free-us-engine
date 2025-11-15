@@ -9,6 +9,8 @@
 #include "data/Framebuffer.h"
 struct GLFWwindow;
 
+void set_raymarch(bool value);
+
 class application
 {
 public:
@@ -23,6 +25,8 @@ public:
 	programs::program_id get_program() const { return prog; }
 	programs::program_id get_instanced_program() const { return instanced_prog; }
 private:
+	void render_raster();
+
 	std::string _texture;
 	std::string _texture_specular;
 	std::string _texture_fbo = "*fbo_texture";
@@ -31,6 +35,7 @@ private:
 	utl::vector<programs::program_id> main_programs;
 	programs::program_id prog;
 	programs::program_id instanced_prog;
+	programs::program_id ray_prog;
 
 	unsigned int _FBO;
 	data::framebuffer::framebuffer_id shadows_fbo;

@@ -13,6 +13,10 @@ float sdCappedTorus(vec3 p, vec2 sc, float ra, float rb)
 
 float sdBaston(vec3 p)
 {
+
+     // --- Flip upside down (180° around X axis) ---
+    p.yz = mat2(-1.0, 0.0,0.0, -1.0) * p.yz;
+                
     // Animation rotation
     float t = iTime * 0.7;
     float cs = cos(t), sn = sin(t);
@@ -20,10 +24,10 @@ float sdBaston(vec3 p)
 
     float torusHeight = 0.5;
     float torusRadius = 0.4;
-    float torusThickness = 0.12;
+    float torusThickness = 0.13;
 
     // ---- Torus ----
-    vec3 pt = p - vec3(0.0, torusHeight, 0.0);
+    vec3 pt = p - vec3(0.15, torusHeight+1.42, 0.0);
     float head = sdCappedTorus(pt, vec2(0.955, 0.3), torusRadius, torusThickness);
 
     // ---- Cylinder attached to side of torus ----
@@ -34,6 +38,9 @@ float sdBaston(vec3 p)
     // ---- Smooth Union ----
     float k = 0.20;
     float h = clamp(0.5 + 0.5 * (handle - head) / k, 0.0, 1.0);
+    
+     
+
     return mix(handle, head, h) - k * h * (1.0 - h);
 }
 
@@ -41,10 +48,6 @@ float sdBaston(vec3 p)
 
 float mapScene(vec3 p)
 {
-    float tilt = radians(20.0);
-    float cx = cos(tilt), sx = sin(tilt);
-    p.yz = mat2(cx, -sx, sx, cx) * p.yz;
-
     return sdBaston(p);
 }
 // -------- Lighting --------
@@ -80,8 +83,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
     
     // Camera setup
-    vec3 ro = vec3(0.0, 0.9, 6.0);
-    vec3 lookAt = vec3(0.0, 1.2, 0.0);
+    vec3 ro = vec3(0.0, 0.5, 6.0);
+    vec3 lookAt = vec3(0.0, 0.2, 0.0);
     vec3 forward = normalize(lookAt - ro);
     vec3 right = normalize(cross(vec3(0.0,1.0,0.0), forward));
     vec3 up = cross(forward, right);

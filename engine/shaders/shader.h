@@ -1,20 +1,37 @@
 #pragma once
+#include <filesystem>
 #include <string>
 #include "core/GLCommon.h"
 #include "core/common.h"
 
-class shader 
-{
-public:
-	shader(const std::string& path, GLenum shader_type);
-	std::string GetPath() const { return _path; }
-	unsigned int GetId() const { return _id; }
-	bool IsActive() const { return _active; }
+namespace shaders {
 
-	void Destroy();
-private:
-	unsigned int _id = 0;
-	std::string _path;
+	enum class ShaderType
+	{
+		VERTEX = 0,
+		FRAGMENT,
+		GEOMETRY
+	};
 
-	bool _active = true;
-};
+	class shader
+	{
+	public:
+		shader(const std::filesystem::path &path, ShaderType shader_type, bool editor_visible = false);
+		void compile();
+
+		std::filesystem::path GetPath() const { return _path; }
+		unsigned int GetId() const { return _id; }
+		bool IsActive() const { return _active; }
+
+		void Destroy();
+
+		ShaderType _shader_type;
+
+		bool _editor_visible = false;
+	private:
+		unsigned int _id = id::invalid_id;
+		std::filesystem::path _path;
+
+		bool _active = true;
+	};
+}

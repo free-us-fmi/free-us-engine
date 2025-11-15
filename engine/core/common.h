@@ -47,3 +47,11 @@ namespace materials
 namespace textures {
 	DEFINE_TYPED_ID(texture);
 }
+
+namespace programs {
+	DEFINE_TYPED_ID(program);
+}
+
+namespace shaders {
+	DEFINE_TYPED_ID(shader);
+}
