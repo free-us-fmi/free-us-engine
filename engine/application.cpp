@@ -34,11 +34,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-
 bool application::Initialize()
 {
 	thread::main_thread::initialize();
 
+	glfwSetErrorCallback(error_callback);
 	if ( ! glfwInit() )
 	{
 		std::cout << "GLFW initialization failed!" << std::endl;
@@ -46,7 +46,7 @@ bool application::Initialize()
 	}
 	
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 1);
 
@@ -151,7 +151,7 @@ bool application::Initialize()
 		programs::program* program = programs::GetProgram(prog);
 
 		program->SetUniform3fv("dirLight.direction", glm::vec3(-0.0f, -1.f, 0.1f));
-		program->SetUniform3fv("dirLight.ambient", glm::vec3(0.23f, 0.23f, 0.23f));
+		program->SetUniform3fv("dirLight.ambient", glm::vec3(0.4f, 0.4f, 0.4f));
 		program->SetUniform3fv("dirLight.diffuse", glm::vec3(0.f, 0.f, 0.f));
 		program->SetUniform3fv("dirLight.specular", glm::vec3(1.f, 1.f, 1.f));
 	}
@@ -260,7 +260,7 @@ void application::Run()
 	if ( glfwWindowShouldClose(_window))
 		_finished = true;
 
-	if ( !raymarched )
+	if ( raymarched )
 		render_raster();
 	else
 		raymarching::render();

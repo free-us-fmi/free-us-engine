@@ -42,11 +42,19 @@ add_executable(editor main.cpp
 		main_bar/file/save_as.cpp
 		main_bar/file/save.cpp
 		main_bar/file/new_project.cpp
+        design_variations/professional_style.h
+		design_variations/professional_style.cpp
+		design_variations/professional_slider.h
+		design_variations/professional_slider.cpp
 
 		shaders/shader_view.cpp
 		shaders/shader_browser.cpp
 		shaders/selected_shader_view.cpp
 
+        design_variations/professional_style.h
+		design_variations/professional_style.cpp
+		design_variations/professional_slider.h
+		design_variations/professional_slider.cpp
 )
 
 target_include_directories(editor PUBLIC ../glfw/include/)
