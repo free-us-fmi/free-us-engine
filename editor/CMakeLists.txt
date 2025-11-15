@@ -8,6 +8,7 @@ add_executable(editor main.cpp
 		ECS/components/selected_entity_view.cpp
 		ECS/components/transform_view.cpp
 		ECS/components/geometry_view.cpp
+		ECS/components/raymarched_geometry.cpp
 		ECS/components/lights/pointlight_view.cpp
 
 		utility/EditorPath.cpp

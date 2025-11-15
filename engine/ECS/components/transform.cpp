@@ -99,17 +99,7 @@ void transform::update_model()
 }
 
 void update_raymarcher() {
-	auto* program = programs::GetProgram(raymarching::get_program());
-	if (!program or !program->linked())
-		return;
-	int component_number = 0;
-	for ( auto& transform : transforms ) {
-		program->SetUniform3fv("objects[" + std::to_string(component_number) + "].scale", transform.get_scale());
-		program->SetUniform3fv("objects[" + std::to_string(component_number) + "].rotation", transform.get_rotation());
-		program->SetUniform3fv("objects[" + std::to_string(component_number) + "].position", transform.get_position());
-		component_number++;
-	}
-	program->SetUniform1i("no_objects", component_number);
+
 }
 
 }

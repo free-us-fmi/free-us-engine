@@ -8,6 +8,7 @@
 #include "content/scene.h"
 #include "editor/content/model_popup.h"
 #include "geometry_view.h"
+#include "raymarched_geometry.h"
 #include "lights/pointlight_view.h"
 #include "engine/ECS/ecs.h"
 #include "editor/design_variations/professional_style.h"
@@ -35,7 +36,7 @@ void update()
         transform::update(_entity->get_transform(), _entity->get_name());
     geometry::update(id);
     pointlight::update(_entity->get_point_light());
-
+    raymarched_geometry::update(id);
     //PS
     editor::professional_style::ApplyProfessionalStyle();
 
@@ -123,6 +124,15 @@ void update()
         {
             pending_component_type = "point light";
             _entity->create_point_light();
+            pending_component_type = "";
+            model_popup_active = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (ImGui::Button("raymarched geometry"))
+        {
+            pending_component_type = "point light";
+            _entity->create_raymarched_geometry();
             pending_component_type = "";
             model_popup_active = false;
             ImGui::CloseCurrentPopup();

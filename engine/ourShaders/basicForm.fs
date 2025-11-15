@@ -241,7 +241,7 @@ float raymarch(vec3 ro, vec3 rd)
         t += d;
         if(t > 20.0) break;
     }
-    return -1;
+    return -1.f;
 }
 
 // -------- Main --------
