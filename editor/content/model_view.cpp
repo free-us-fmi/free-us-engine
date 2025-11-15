@@ -35,12 +35,33 @@ void update()
 		selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::models);
 	}
 
-	if ( ImGui::Button("add model") )
+	ImGui::Spacing();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0)); // Transparent black background
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.2f)); // Dark gray on hover
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 0.5f)); // Gray when pressed
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.5, 0.5, 0.5, 0.5)); // White border
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f); // Border thickness
+
+	if ( ImGui::Button("Add model", ImVec2(300, 0)) )
 	{
 		popup = true;
-		file_browser::popup::initialize(assets::GetAssetsPath(), true);	
+		file_browser::popup::initialize(assets::GetAssetsPath(), true);
 		file_browser::popup::open();
 	}
+
+	ImGui::PopStyleVar();
+	ImGui::PopStyleColor(4);
+
+	ImGui::Spacing();
+
+	float available_height = ImGui::GetContentRegionAvail().y;
+	ImGui::BeginChild("ModelList", ImVec2(0, available_height), true);
+	{
+		ImGui::Spacing();
+		browser.update();
+	}
+	ImGui::EndChild();
 	
 	if ( popup )
 		file_browser::popup::update();
@@ -50,7 +71,8 @@ void update()
 	{
 		if ( last_path != "" )
 		{
-			auto t = std::thread(::content::scene::create_scene, std::filesystem::path(last_path).filename().string(), last_path, false);
+			auto t = std::thread(::content::scene::create_scene,
+				std::filesystem::path(last_path).filename().string(), last_path, false);
 			t.detach();
 		}
 		popup = false;
@@ -72,8 +94,6 @@ void update()
 			helpers::progress::popup::finalize();
 		}
 	}
-
-	browser.update();
 
 }
 

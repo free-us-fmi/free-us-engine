@@ -9,8 +9,8 @@
 namespace editor::model_browser::popup
 {
 
-namespace {	
-	
+namespace {
+
 	bool transparent = false;
 	bool initialized = false;
 	std::string selected_model = "";
@@ -78,6 +78,14 @@ void update()
 		ImGui::Checkbox("transparent", &transparent);
 
 		ImGui::EndChild();
+
+		ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 85, ImGui::GetWindowSize().y - 35));
+		if (ImGui::Button("Cancel", ImVec2(80, 25)))
+		{
+			selected_model = "";
+			ImGui::CloseCurrentPopup();
+			finalize();
+		}
 
 		selected_model = browser.last_selected_item();
 		if ( !browser.last_selected_is_empty() )

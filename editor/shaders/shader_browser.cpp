@@ -15,8 +15,6 @@ namespace editor::shader_browser
     }
     void shader_browser::update()
     {
-        ImGui::Text("%s", "models");
-
         std::unordered_map<std::string, ::programs::program_id>& programs_ids = ::programs::get_programs();
         utl::vector<std::string> programs_names;
         for ( auto& program_id: programs_ids ) {

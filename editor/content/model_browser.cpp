@@ -12,14 +12,12 @@ namespace editor::model_browser
 
 void model_browser::update()
 {
-	ImGui::Text("%s", "models");
-	
-	std::unordered_map<std::string, content::scene::scene>& scenes = content::scene::get_scenes();	
+	std::unordered_map<std::string, content::scene::scene>& scenes = content::scene::get_scenes();
 	utl::vector<std::string> scene_names;
 	for ( auto& scene : scenes )
 		scene_names.emplace_back(scene.first);
 	string_browser::browser::update(scene_names);
 }
 
-	
+
 }

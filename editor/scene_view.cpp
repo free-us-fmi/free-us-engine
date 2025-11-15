@@ -48,7 +48,7 @@ void clear()
 }
 void update()
 {
-	ImGui::Begin("world view", NULL, ImGuiWindowFlags_NoScrollbar);
+	ImGui::Begin("World View", NULL, ImGuiWindowFlags_NoScrollbar);
 
 		data::framebuffer::framebuffer* _ms_framebuffer = data::framebuffer::GetFramebuffer(_ms_framebuffer_id);
 		data::framebuffer::framebuffer* _framebuffer = data::framebuffer::GetFramebuffer(_framebuffer_id);

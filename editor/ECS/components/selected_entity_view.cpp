@@ -15,10 +15,12 @@
 namespace editor::selected_entity
 {
 
-static bool show_component_controls = false;
-static std::string pending_model_path = "";
-static std::string pending_component_type = "";
-static bool model_popup_active = false;
+    static bool show_component_controls = false;
+    static std::string pending_model_path = "";
+    static std::string pending_component_type = "";
+    static bool model_popup_active = false;
+    static bool show_remove_confirmation = false;
+
 
 void update()
 {
@@ -62,9 +64,7 @@ void update()
 
         if (ImGui::Selectable("Remove Entity"))
         {
-            ecs::remove_entity(id);
-            editor::professional_style::RestoreStyle();
-            return;
+            show_remove_confirmation = true;
         }
 
         ImGui::Spacing();
@@ -73,23 +73,53 @@ void update()
     ImGui::Separator();
     editor::professional_style::RestoreStyle();
 
+    if (show_remove_confirmation)
+    {
+        ImGui::OpenPopup("Confirm Removal");
+        show_remove_confirmation = false;
+    }
+
+    if (ImGui::BeginPopupModal("Confirm Removal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Are you sure you want to remove this entity?");
+        ImGui::Spacing();
+
+        if (ImGui::Button("Confirm", ImVec2(150, 25)))
+        {
+            ecs::remove_entity(id);
+            ImGui::CloseCurrentPopup();
+            editor::professional_style::RestoreStyle();
+            return;
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel", ImVec2(150, 25)))
+        {
+            ImGui::CloseCurrentPopup();
+            model_popup_active = false;
+        }
+
+        ImGui::EndPopup();
+    }
+
     if (ImGui::BeginPopupModal("Add component"))
     {
-        if (ImGui::Button("geometry"))
+        if (ImGui::Button("Geometry"))
         {
             pending_component_type = "geometry";
             model_popup_active = true;
             model_browser::popup::open();
         }
 
-        if (ImGui::Button("instanced geometry"))
+        if (ImGui::Button("Instanced geometry"))
         {
             pending_component_type = "instanced geometry";
             model_popup_active = true;
             model_browser::popup::open();
         }
 
-        if (ImGui::Button("point light"))
+        if (ImGui::Button("Point light"))
         {
             pending_component_type = "point light";
             _entity->create_point_light();
@@ -120,6 +150,15 @@ void update()
             pending_model_path = "";
             pending_component_type = "";
             model_popup_active = false;
+        }
+
+        ImGui::SetCursorPos(ImVec2(ImGui::GetWindowSize().x - 85, ImGui::GetWindowSize().y - 35));
+        if (ImGui::Button("Cancel", ImVec2(80, 25)))
+        {
+            pending_component_type = "";
+            pending_model_path = "";
+            model_popup_active = false;
+            ImGui::CloseCurrentPopup();
         }
 
         ImGui::EndPopup();

@@ -13,14 +13,27 @@ namespace editor::shaders {
         std::string selected_shader;
     }
 
-    void update() {
+    void update()
+    {
         static bool popup = false;
 
-        if ( ImGui::Button("add shader")) {
+        ImGui::Spacing();
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0)); // Transparent black background
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.2f)); // Dark gray on hover
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 0.5f)); // Gray when pressed
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.5, 0.5, 0.5, 0.5)); // White border
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f); // Border thickness
+
+
+        if ( ImGui::Button("Add shader", ImVec2(300, 0))) {
             popup = true;
-            helpers::textbox::popup::initialize("shader name", "add shader");
+            helpers::textbox::popup::initialize("Shader name", "Add shader");
             helpers::textbox::popup::open();
         }
+
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(4);
 
         if ( popup && helpers::textbox::popup::finished() ) {
             serializer::shaders::create_shader(helpers::textbox::popup::result());
@@ -34,13 +47,19 @@ namespace editor::shaders {
 
         shader_browser.update();
 
-        if ( selected_shader != shader_browser.last_selected_item() )
+        float available_height = ImGui::GetContentRegionAvail().y;
+        ImGui::BeginChild("ShaderList", ImVec2(0, available_height), true);
         {
-            selected_shader = shader_browser.last_selected_item();
-            ::raymarching::set_program(selected_shader);
-            selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::shaders);
+            if ( selected_shader != shader_browser.last_selected_item() )
+            {
+                selected_shader = shader_browser.last_selected_item();
+                ::raymarching::set_program(selected_shader);
+                selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::shaders);
+            }
         }
+        ImGui::EndChild();
     }
+
 
     std::string get_selected_shader() {
         return selected_shader;
