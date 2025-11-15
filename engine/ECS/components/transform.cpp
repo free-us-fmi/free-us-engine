@@ -100,7 +100,8 @@ void transform::update_model()
 
 void update_raymarcher() {
 	auto* program = programs::GetProgram(raymarching::get_program());
-
+	if (!program)
+		return;
 	int component_number = 0;
 	for ( auto& transform : transforms ) {
 		program->SetUniform3fv("models[" + std::to_string(component_number) + "].scale", transform.get_scale());
