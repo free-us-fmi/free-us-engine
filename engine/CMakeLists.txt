@@ -35,7 +35,7 @@ add_library(engine STATIC ../glad/src/glad.c
 
 		thread/main_thread_dispatcher.cpp
 
-)
+ )
 
 
 target_include_directories(engine PUBLIC ../glfw/include/)

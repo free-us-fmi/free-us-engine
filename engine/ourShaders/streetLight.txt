@@ -1,0 +1,120 @@
+// -------- Hexagonal Cone SDF --------
+float sdHexCone(vec3 p, float r0, float r1, float h)
+{
+    // push shape down so base is centered nicely
+    p.y -= h*0.5;
+
+    float y = clamp((p.y + h*0.5) / h, 0.0, 1.0);
+    float k = mix(r0, r1, y);
+
+    vec2 q = abs(p.xz);
+    const vec2 khex = vec2(-0.8660254, 0.5);
+    q -= 2.0 * min(dot(khex, q), 0.0) * khex;
+
+    float dHex = max(q.x, q.y * 0.57735) - k;
+    float dY = abs(p.y) - h*0.5;
+
+    return max(dHex, dY);
+}
+
+// -------- Hexagonal Cone with Rounded Top --------
+float sdHexConeRounded(vec3 p, float r0, float r1, float h, float roundTip)
+{
+    // move shape down so base is centered
+    p.y -= h*0.5;
+
+    float y = clamp((p.y + h*0.5) / h, 0.0, 1.0);
+    float k = mix(r0, r1, y);
+
+    // hex projection
+    vec2 q = abs(p.xz);
+    const vec2 khex = vec2(-0.8660254, 0.5);
+    q -= 2.0 * min(dot(khex, q), 0.0) * khex;
+
+    float dHex = max(q.x, q.y * 0.57735) - k;
+    float dY = abs(p.y) - h*0.5;
+
+    float d = max(dHex, dY);
+
+    // ROUND the tip (umbrella effect)
+    float tipDist = length(vec2(dHex, p.y - h*0.5)) - roundTip;
+
+    // use smooth min for blending tip
+    float kSmooth = 0.1; // softness of rounding
+    float smoothMin = -log(exp(-tipDist/kSmooth) + exp(-d/kSmooth))*kSmooth;
+
+    return smoothMin;
+}
+
+
+// --------- Scene SDF (rotation applied) ---------
+float mapScene(vec3 p)
+{
+    // rotate hex-cone
+    float t = iTime * 0.7;
+    float cs = cos(t), sn = sin(t);
+    p.xz = mat2(cs, -sn, sn, cs) * p.xz;
+
+    return sdHexConeRounded(p, 1.0, 0.1, 1.3, 0.2);
+}
+
+
+
+// -------- Lighting --------
+vec3 getNormal(vec3 p)
+{
+    const float e = 0.001;
+    return normalize(vec3(
+        mapScene(p + vec3(e,0,0)) - mapScene(p - vec3(e,0,0)),
+        mapScene(p + vec3(0,e,0)) - mapScene(p - vec3(0,e,0)),
+        mapScene(p + vec3(0,0,e)) - mapScene(p - vec3(0,0,e))
+    ));
+}
+
+// -------- Raymarch --------
+float raymarch(vec3 ro, vec3 rd)
+{
+    float t = 0.0;
+    for(int i=0;i<120;i++)
+    {
+        vec3 p = ro + rd * t;
+        float d = mapScene(p);
+        if(d < 0.001) return t;
+        t += d;
+        if(t > 20.0) break;
+    }
+    return -1.0;
+}
+
+
+// -------- Main --------
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+
+    // Camera setup
+    vec3 ro = vec3(0.0, 1.2, 4.5);
+    vec3 rd = normalize(vec3(uv, -1.5));
+
+    float t = raymarch(ro, rd);
+
+    if(t > 0.0)
+    {
+        vec3 p = ro + rd * t;
+        vec3 n = getNormal(p);
+
+        // Simple lighting
+        vec3 lightPos = vec3(2.0, 3.0, 2.0);
+        vec3 l = normalize(lightPos - p);
+
+        float diff = max(dot(n, l), 0.0);
+        float spec = pow(max(dot(reflect(-l, n), -rd), 0.0), 32.0);
+
+        vec3 col = vec3(0.2, 0.7, 1.0) * diff + spec;
+        fragColor = vec4(col, 1.0);
+    }
+    else
+    {
+        fragColor = vec4(0.02, 0.02, 0.03, 1.0);
+    }
+}
