@@ -17,15 +17,17 @@ void browser::update(utl::vector<std::string>& string_elements)
 {
 	utl::vector<helpers::draw_browser::browser_element> elements;
 
-	for ( const auto& entry : string_elements )
-	{	
+	for (const auto& entry : string_elements)
+	{
 		auto tex = assets::browser_assets::get_texture_id(assets::browser_assets::asset::file);
-		elements.push_back({entry, tex});
+		elements.push_back({ entry, tex });
 	}
 	std::string selected_model = helpers::draw_browser::draw_browser(elements);
 
-	if ( selected_model != "" )
+	if (selected_model != "") {
+		_fence++;
 		_last_selected_item = selected_model;
+	}
 }
 
 }

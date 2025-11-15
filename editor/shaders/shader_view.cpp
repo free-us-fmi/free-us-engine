@@ -11,6 +11,7 @@ namespace editor::shaders {
     namespace {
         shader_browser::shader_browser shader_browser;
         std::string selected_shader;
+        unsigned int browser_fence = 0;
     }
 
     void update() {
@@ -34,11 +35,16 @@ namespace editor::shaders {
 
         shader_browser.update();
 
+        if (browser_fence != shader_browser.get_fence())
+        {
+            browser_fence = shader_browser.get_fence();
+            selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::shaders);
+        }
+
         if ( selected_shader != shader_browser.last_selected_item() )
         {
             selected_shader = shader_browser.last_selected_item();
             ::raymarching::set_program(selected_shader);
-            selected_asset::set_selected_asset_type(selected_asset::last_selected_asset_type::shaders);
         }
     }
 
