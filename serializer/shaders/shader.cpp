@@ -31,11 +31,10 @@ namespace serializer::shaders {
             std::filesystem::create_directory(shaders_path);
     }
 
-    void load_shader(const std::filesystem::path& shader_path) {
+    void load_shader(std::filesystem::path shader_path) {
         std::string shader_extension = shader_path.extension().string();
 
-        if ( shader_extension != ".fs" )
-            return;
+        shader_path.replace_extension(".fs");
 
         ::programs::program_id prog = programs::AddProgram(shader_path.filename().string(), ::shaders::GetShadersPath() + "raymarching/raymarch.vs",
                                        shader_path.string());
@@ -46,6 +45,8 @@ namespace serializer::shaders {
     void create_shader(const std::string& shader_name) {
         create_shaders_directory();
         std::filesystem::path shader_path = get_shader_path(shader_name);
+        shader_path.replace_extension(".fs");
+
         if ( !std::filesystem::exists(shader_path) ) {
             std::ofstream shader_file(shader_path);
             shader_file.close();

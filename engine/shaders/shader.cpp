@@ -50,7 +50,7 @@ namespace shaders {
 		char infoLog[512];
 		glGetShaderiv(_id, GL_COMPILE_STATUS, &success);
 
-		if ( !success )
+		if ( success==GL_FALSE )
 		{
 			glGetShaderInfoLog(_id, 512, NULL, infoLog);
 			std::cout << "Error compiling shader: " << _path.string() << std::endl;
