@@ -221,32 +221,66 @@ vec3 buildingTexture(vec3 p)
     float brickWidth = 0.6;
     float brickHeight = 0.3;
     float mortar = 0.03;
-    vec3 brickColor = vec3(0.55, 0.2, 0.15);
-    vec3 mortarColor = vec3(0.6, 0.6, 0.6);
+    vec3 brickColor = vec3(0.55,0.2,0.15);
+    vec3 mortarColor = vec3(0.6,0.6,0.6);
 
-    // Determine row and stagger offset
+    // Determine row
     float row = floor(p.y / brickHeight);
-    float offset = mod(row, 2.0) * brickWidth * 0.5;
 
-    // Local position inside current brick
-    float xLocal = mod(p.x + offset, brickWidth);
-    float yLocal = mod(p.y, brickHeight);
+    // Stagger offset every other row
+    float stagger = mod(row, 2.0) * 0.5 * brickWidth;
 
-    // Determine if inside brick area (excluding mortar)
-    float insideX = step(mortar, xLocal) * step(xLocal, brickWidth - mortar);
-    float insideY = step(mortar, yLocal) * step(yLocal, brickHeight - mortar);
-    float mask = insideX * insideY;
+    // Global position with stagger
+    float xGlobal = p.x + stagger;
+    float yGlobal = p.y;
 
-    // Add slight variation per brick
-    float n = fract(sin(dot(floor(vec2(p.x, p.y)), vec2(12.9898, 78.233))) * 43758.5453);
+    // Compute distance to nearest vertical edge
+    float xEdgeDist = mod(xGlobal, brickWidth);
+    float yEdgeDist = mod(yGlobal, brickHeight);
+
+    // Mask: 1 if inside brick, 0 if in mortar
+    float maskX = step(mortar, xEdgeDist) * step(xEdgeDist, brickWidth - mortar);
+    float maskY = step(mortar, yEdgeDist) * step(yEdgeDist, brickHeight - mortar);
+    float mask = maskX * maskY;
+
+    // Add slight color variation per brick
+    float n = fract(sin(dot(floor(vec2(xGlobal/brickWidth, yGlobal/brickHeight)), vec2(12.9898,78.233))) * 43758.5453);
     vec3 variedBrick = brickColor * (0.8 + 0.2 * n);
 
-    // Combine brick and mortar
     return mix(mortarColor, variedBrick, mask);
 }
 
 
 
+
+
+
+//---------------------------------
+// SHADOW
+//--------------------------
+float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k)
+{
+    float res = 1.0;
+    float t = mint;
+    int tmpMatID; // <-- declare a variable
+    for(int i=0; i<64; i++)
+    {
+        float h = mapScene(ro + rd*t, tmpMatID); // pass variable
+        if(h < 0.001) return 0.0; // fully shadowed
+        res = min(res, k*h/t);     // soft shadow factor
+        t += clamp(h, 0.01, 0.2);
+        if(t>maxt) break;
+    }
+    return clamp(res, 0.0, 1.0);
+}
+
+//------------------------------------
+//pastel
+//-----------------------------
+vec3 pastel(vec3 c) {
+    // Mix with white to lighten and soften the color
+    return mix(c, vec3(1.0), 0.5); // 0.5 = amount of "pastelness"
+}
 
 
 // ---------------------------------------------------------
@@ -263,13 +297,14 @@ vec3 shade(vec3 ro, vec3 rd)
         t+=d*0.8;
     }
 
-    if (t>20.0) return vec3(0.80, 0.91, 0.95);
+    if (t>20.0) return vec3(0.7, 0.85, 1.0);
 
     vec3 p=ro+rd*t;
     vec3 n=getNormal(p);
     vec3 lightDir=normalize(vec3(0.4,1.0,0.3));
+    float sh = softShadow(p + n*0.001, lightDir, 0.01, 10.0, 32.0);
 
-    float diff=max(dot(n,lightDir)*2.,.0);
+    float diff = max(dot(n, lightDir)*2.0, 0.0) * sh;
     float spec=pow(max(dot(reflect(-lightDir,n),-rd),0.0),32.0)*2.2;
 
     vec3 col;
@@ -304,7 +339,7 @@ vec3 shade(vec3 ro, vec3 rd)
     else if(matID>=5) // umbrellas
     {
         float h = fract(float(matID)*0.17);
-        vec3 base = palette(h);
+        vec3 base = pastel(palette(h));
         float pulse = 0.5 + 0.5*sin(uTime*2.0+h*6.28);
         col = base*(0.4+0.6*diff*pulse) + 0.2*spec;
     }
@@ -332,5 +367,12 @@ void main()
     rd.yz = Rot(angle) * rd.yz;
 
     vec3 col = shade(ro, rd);
+
+    // --- Add subtle fog ---
+    float t = length(ro); // approximate distance along the ray
+    float fogAmount = 1.0 - exp(-0.02 * t); // controls density, tweak 0.02
+    vec3 fogColor = vec3(0.7, 0.85, 1.0);   // light blue fog
+    col = mix(col, fogColor, fogAmount);
+
     FragColor = vec4(col,1.0);
 }
