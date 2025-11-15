@@ -83,7 +83,7 @@ namespace serializer::content::scene {
         void write_detail(const std::string& scene_uid, ::content::scene::scene& scene, const std::string& scene_name) {
 
             writer writer;
-            writer.open(get_detail_path(scene_uid));
+            writer.open(get_detail_path(scene_uid).string());
             writer.write(scene_name);
 
             std::string scene_detail_data;
@@ -103,7 +103,7 @@ namespace serializer::content::scene {
                 scene_base_data += model::get_base(model.second);
 
             writer writer;
-            writer.open(get_base_path(scene_uid));
+            writer.open(get_base_path(scene_uid).string());
 
             writer.write(count);
             writer.write(scene_base_data, false);

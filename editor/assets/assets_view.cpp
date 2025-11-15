@@ -5,6 +5,8 @@
 #include "ECS/components/selected_entity_view.h"
 #include "selected_asset_view.h"
 #include "content/model_view.h"
+#include "shaders/shader_view.h"
+
 namespace editor::assets 
 {
 
@@ -33,6 +35,10 @@ void update()
 	{
 		_selected_tab = selected_assets_tab::materials;
 	}
+	ImGui::SameLine();
+	if ( ImGui::Button("shaders") ) {
+		_selected_tab = selected_assets_tab::shaders;
+	}
 
 	ImGui::BeginChild("asset view");
 
@@ -40,6 +46,8 @@ void update()
 		model::update();
 	else if ( _selected_tab == selected_assets_tab::materials )
 		materials::update();
+	else if ( _selected_tab == selected_assets_tab::shaders )
+		shaders::update();
 
 	ImGui::EndChild();
 

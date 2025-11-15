@@ -8,6 +8,7 @@ enum class last_selected_asset_type
 	models,
 	materials,
 	entities,
+	shaders,
 	none
 };
 

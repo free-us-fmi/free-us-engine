@@ -18,7 +18,7 @@ public:
 
 		count
 	};
-	static constexpr std::array<std::string, texture_type::count> type_name = {"diffuse", "specular"};
+	static std::array<std::string, texture_type::count> type_name;
 
 	std::string _name;
 	std::string _uid;

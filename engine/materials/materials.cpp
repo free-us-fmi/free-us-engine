@@ -6,6 +6,7 @@
 #include "managers/ProgramManager.h"
 
 namespace materials {
+    std::array<std::string, material::texture_type::count> material::type_name = { "diffuse", "specular" };
 
     bool material::has_texture(texture_type type) const {
         return textures.contains(type);
