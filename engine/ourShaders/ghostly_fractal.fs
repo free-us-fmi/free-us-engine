@@ -1,7 +1,7 @@
 #version 330 core
 
 vec2  iResolution = vec2(1920, 1080);
-float iTime = 1.f;
+uniform float iTime;
 
 /*** --- SAFE SHADERTOY MACRO REPLACEMENTS --- ***/
 // Shadertoy-style macro rewritten to a function

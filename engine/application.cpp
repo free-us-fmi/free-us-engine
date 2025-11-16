@@ -73,6 +73,21 @@ bool application::Initialize()
 	programs::GetProgram("basicGeometricForms")->_editor_visible = true;
 	programs::GetProgram("basicGeometricForms")->_unloadable = false;
 
+	programs::AddProgram("nyan", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/nyan.fs");
+	programs::GetProgram("nyan")->_editor_visible = true;
+	programs::GetProgram("nyan")->_unloadable = false;
+
+	programs::AddProgram("mandel", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/mandel.fs");
+	programs::GetProgram("mandel")->_editor_visible = true;
+	programs::GetProgram("mandel")->_unloadable = false;
+
+	programs::AddProgram("mandelbulb", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/mandelbulb.fs");
+	programs::GetProgram("mandelbulb")->_editor_visible = true;
+	programs::GetProgram("mandelbulb")->_unloadable = false;
+	programs::AddProgram("trees", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/trees.fs");
+	programs::GetProgram("trees")->_editor_visible = true;
+	programs::GetProgram("trees")->_unloadable = false;
+
 	programs::AddProgram("ghostly_fractal", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/ghostly_fractal.fs");
 	programs::GetProgram("ghostly_fractal")->_editor_visible = true;
 	programs::GetProgram("ghostly_fractal")->_unloadable = false;
