@@ -28,14 +28,19 @@ namespace editor::raymarched_geometry
             show_raymarched_geometry_controls = !show_raymarched_geometry_controls;
         }
 
+        ImGui::Separator();
+
         if ( !show_raymarched_geometry_controls )
             return;
 
-        if (ImGui::Combo("Model type", &selected_item, items, IM_ARRAYSIZE(items)))
-            geo->set_model_type(static_cast<::ecs::components::raymarched_geometry::model_types>(selected_item));
+        ImGui::Spacing();
+        ImGui::Text("Model type:");
+        ImGui::Spacing();
 
-        if (ImGui::Combo("Model type", &selected_item, items, IM_ARRAYSIZE(items)))
+        if (ImGui::Combo("##ModelType", &selected_item, items, IM_ARRAYSIZE(items)))
             geo->set_model_type(static_cast<::ecs::components::raymarched_geometry::model_types>(selected_item));
-
+        ImGui::Spacing();
+        ImGui::Separator();
     }
+
 }

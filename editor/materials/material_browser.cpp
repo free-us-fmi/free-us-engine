@@ -1,4 +1,6 @@
 #include "material_browser.h"
+
+#include "imgui.h"
 #include "engine/utility/vector.h"
 #include "engine/managers/MaterialManager.h"
 
@@ -13,7 +15,12 @@ void browser::update()
 	for ( auto& material : materials )
 		material_names.emplace_back(material._name);
 
-	string_browser::browser::update(material_names);
+	float available_height = ImGui::GetContentRegionAvail().y - 40; // Reserve space for button
+	ImGui::BeginChild("MaterialBrowserList", ImVec2(0, available_height), true);
+	{
+		string_browser::browser::update(material_names);
+	}
+	ImGui::EndChild();
 }
 
 }

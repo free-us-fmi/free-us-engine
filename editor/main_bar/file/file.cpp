@@ -21,15 +21,23 @@ namespace editor::main_menu::file {
     }
 
     void show() {
-            if ( ImGui::MenuItem("new"))
-                new_project::run();
-            if ( ImGui::MenuItem("save as") )
-                save_as::run();
-            if ( ImGui::MenuItem("save"))
-                save::run();
-            if ( ImGui::MenuItem("unload"))
-                unload::run();
-            if ( ImGui::MenuItem("open"))
-                load::run();
+        if ( ImGui::MenuItem("New"))
+            new_project::run();
+        ImGui::Separator();
+
+        if ( ImGui::MenuItem("Save as") )
+            save_as::run();
+        ImGui::Separator();
+
+        if ( ImGui::MenuItem("Save"))
+            save::run();
+        ImGui::Separator();
+
+        if ( ImGui::MenuItem("Unload"))
+            unload::run();
+        ImGui::Separator();
+
+        if ( ImGui::MenuItem("Open"))
+            load::run();
     }
 }

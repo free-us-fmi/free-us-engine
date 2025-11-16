@@ -129,7 +129,7 @@ void update()
             ImGui::CloseCurrentPopup();
         }
 
-        if (ImGui::Button("raymarched geometry"))
+        if (ImGui::Button("Raymarched geometry"))
         {
             pending_component_type = "point light";
             _entity->create_raymarched_geometry();

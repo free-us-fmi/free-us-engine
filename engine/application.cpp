@@ -50,7 +50,7 @@ bool application::Initialize()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 1);
 
-	_window = glfwCreateWindow(1600, 900, "fereastra", NULL, NULL);
+	_window = glfwCreateWindow(1600, 900, "Engine", NULL, NULL);
 
 	if ( ! _window )
 	{
@@ -69,9 +69,9 @@ bool application::Initialize()
 	programs::AddProgram("umbrella", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/umbrellaStreet.fs");
 	programs::GetProgram("umbrella")->_editor_visible = true;
 	programs::GetProgram("umbrella")->_unloadable = false;
-	programs::AddProgram("basicGeometricForms", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/basicForm.fs");
-	programs::GetProgram("basicGeometricForms")->_editor_visible = true;
-	programs::GetProgram("basicGeometricForms")->_unloadable = false;
+	programs::AddProgram("Basic Geometric Forms", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/basicForm.fs");
+	programs::GetProgram("Basic Geometric Forms")->_editor_visible = true;
+	programs::GetProgram("Basic Geometric Forms")->_unloadable = false;
 	instanced_prog = programs::AddProgram("instanced", shaders::GetShadersPath() + "instanced.vs", shaders::GetShadersPath() + "default.fs");
 
 	programs::program_id sin_waves = programs::AddProgram("sin_waves",
