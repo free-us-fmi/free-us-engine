@@ -13,7 +13,7 @@ namespace editor::selected_shader {
         auto* prog = ::programs::GetProgram(selected_name);
 
         ImGui::Text("%s", selected_name.c_str());
-        if ( ImGui::Button("compile shader") ) {
+        if ( ImGui::Button("Compile shader", ImVec2(-1, 0))) {
             prog->Link();
         }
     }

@@ -8,6 +8,7 @@ namespace editor::material_browser::popup
 namespace {	
 	bool initialized = false;
 	browser browser;
+	bool was_cancelled = false;
 
 	void finalize()
 	{
@@ -19,9 +20,10 @@ void initialize_and_open()
 {
 	initialized = true;
 	browser.initialize();
+	was_cancelled = false;
 
-	ImGui::SetNextWindowSize(ImVec2(512, 512));
-	ImGui::OpenPopup("select model");
+	ImGui::SetNextWindowSize(ImVec2(800, 512));
+	ImGui::OpenPopup("Select model");
 }
 
 std::string update()
@@ -30,10 +32,23 @@ std::string update()
 	if ( !initialized )
 		return result;
 
-	if(ImGui::BeginPopupModal("select model") )
+	if(ImGui::BeginPopupModal("Select model") )
 	{
 		browser.update();
 		result = browser.last_selected_item();
+
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 40);
+		if (ImGui::Button("Close", ImVec2(-1, 25)))
+		{
+			was_cancelled = true;
+			result = "";
+			ImGui::CloseCurrentPopup();
+			finalize();
+		}
 
 		if ( result != "" )
 		{

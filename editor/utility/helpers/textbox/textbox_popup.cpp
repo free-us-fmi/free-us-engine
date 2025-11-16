@@ -45,6 +45,26 @@ namespace editor::helpers::textbox::popup {
             ImGui::InputTextWithHint("##input", _preview_text.c_str(), buf, 255);
             _result = buf;
 
+            // Handle error popup INSIDE the main popup
+            if (show_error_popup)
+            {
+                ImGui::OpenPopup("Error");
+            }
+
+            if (ImGui::BeginPopupModal("Error", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                ImGui::Text("Name cannot be empty!");
+                ImGui::Spacing();
+
+                if (ImGui::Button("Close", ImVec2(80, 25)))
+                {
+                    show_error_popup = false;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
+
             float content_height = ImGui::GetContentRegionAvail().y - 30;
 
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + content_height);
@@ -53,7 +73,6 @@ namespace editor::helpers::textbox::popup {
 
             if( ImGui::Button("Confirm" ,ImVec2(button_width, 25)) )
             {
-
                 if (!_result.empty())
                 {
                     finalize();
@@ -70,25 +89,6 @@ namespace editor::helpers::textbox::popup {
             {
                 was_cancelled = true;
                 finalize();
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::EndPopup();
-        }
-
-        if (show_error_popup)
-        {
-            ImGui::OpenPopup("Error");
-        }
-
-        if (ImGui::BeginPopupModal("Error", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            ImGui::Text("Name cannot be empty!");
-            ImGui::Spacing();
-
-            if (ImGui::Button("Close", ImVec2(-1, 25)))
-            {
-                show_error_popup = false;
                 ImGui::CloseCurrentPopup();
             }
 

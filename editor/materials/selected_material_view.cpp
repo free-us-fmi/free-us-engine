@@ -27,7 +27,7 @@ void update()
 
 	ImGui::Text("Diffuse: ");
 	ImGui::SameLine();
-	if ( ImGui::Button("change diffuse") )
+	if ( ImGui::Button("Change diffuse") )
 	{
 		popup = texture_popup_type::diffuse;
 		file_browser::popup::initialize(assets::GetAssetsPath(), true);
@@ -36,7 +36,7 @@ void update()
 
 	ImGui::Text("Specular: ");
 	ImGui::SameLine();
-	if ( ImGui::Button("change specular") )
+	if ( ImGui::Button("Change specular") )
 	{
 		popup = texture_popup_type::specular;
 		file_browser::popup::initialize(assets::GetAssetsPath(), true);

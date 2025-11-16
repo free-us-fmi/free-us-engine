@@ -43,7 +43,7 @@ void initialize()
 void open()
 {
 	ImGui::SetNextWindowSize(ImVec2(512, 512));
-	ImGui::OpenPopup("select model");
+	ImGui::OpenPopup("Select model");
 }
 
 void update()
@@ -51,7 +51,7 @@ void update()
 	if ( !initialized )
 		return;
 
-	if(ImGui::BeginPopupModal("select model") )
+	if(ImGui::BeginPopupModal("Select model") )
 	{
 		ImGui::BeginChild("model popup broswer", ImVec2(ImGui::GetWindowSize().x * 0.7, ImGui::GetWindowSize().y));
 		browser.update();

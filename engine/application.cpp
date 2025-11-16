@@ -92,6 +92,9 @@ bool application::Initialize()
 	programs::GetProgram("ghostly_fractal")->_editor_visible = true;
 	programs::GetProgram("ghostly_fractal")->_unloadable = false;
 
+	programs::AddProgram("Basic Geometric Forms", shaders::GetShadersPath() + "raymarching/raymarch.vs", shaders::GetShadersPath() + "../../ourShaders/basicForm.fs");
+	programs::GetProgram("Basic Geometric Forms")->_editor_visible = true;
+	programs::GetProgram("Basic Geometric Forms")->_unloadable = false;
 	instanced_prog = programs::AddProgram("instanced", shaders::GetShadersPath() + "instanced.vs", shaders::GetShadersPath() + "default.fs");
 
 	programs::program_id sin_waves = programs::AddProgram("sin_waves",
