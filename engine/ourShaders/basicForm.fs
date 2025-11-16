@@ -300,6 +300,6 @@ void main()
     }
     else
     {
-        FragColor = vec4(0.5, 0.02, 0.03, 1.0);
+        FragColor = vec4(0.3, 0.5, 1., 1.);
     }
 }
