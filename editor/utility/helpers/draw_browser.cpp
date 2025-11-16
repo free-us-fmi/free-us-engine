@@ -7,9 +7,9 @@ std::string draw_browser(utl::vector<browser_element>& elements)
 	std::string selected_element = "";
 
 	ImGui::BeginGroup();
-	static float border_x = 20.f;
-	static float item_separation_size = 20.f;
-	static float icon_size = 64.f;
+	float border_x = 20.f;
+	float item_separation_size = 20.f;
+	float icon_size = 64.f;
 
 	float next_offsetx = border_x;
 	float next_offsety = 0.f;

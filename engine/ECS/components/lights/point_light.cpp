@@ -4,6 +4,8 @@
 #include "utility/vector.h"
 #include "ECS/components/transform.h"
 #include <iostream>
+
+#include "core/camera.h"
 #include "ECS/entity.h"
 #include "ECS/ecs.h"
 #include "raymarcher/renderer.h"
@@ -265,6 +267,10 @@ void update_raymarch() {
 		component_number++;
 	}
 	program->SetUniform1i("no_lights", component_number);
+	program->SetUniform1f("iTime", glfwGetTime());
+	program->SetUniform3fv("iCameraDir", camera::GetForward());
+	program->SetUniform3fv("iCameraPos", camera::GetCameraPos());
+	program->Bind();
 
 }
 }

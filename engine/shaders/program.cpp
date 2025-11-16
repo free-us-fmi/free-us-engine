@@ -57,6 +57,9 @@ void program::Link()
 		glDeleteProgram(_id);
 	_id = glCreateProgram();
 
+	_uniform_cache.clear();
+	_uniforms_to_set.clear();
+
 	_linked = false;
 	for ( auto& shader_id : _shaders ) {
 		auto* shader = shaders::get_shader(shader_id);

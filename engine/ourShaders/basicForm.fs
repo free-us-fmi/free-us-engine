@@ -250,6 +250,8 @@ float raymarch(vec3 ro, vec3 rd)
     return -1.f;
 }
 
+uniform vec3 iCameraPos;
+uniform vec3 iCameraDir;
 // -------- Main --------
 void main()
 {
@@ -258,7 +260,7 @@ void main()
     vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
 
     // Camera setup
-    vec3 ro = vec3(0.0, 0.7, 8.0);
+    vec3 ro = vec3(0.0, 0.7, 15.0);
     vec3 rd = normalize(vec3(uv, -1.3));
 
     float tHit = raymarch(ro, rd);
@@ -295,7 +297,7 @@ void main()
 
         // tone mapping
        // col = pow(col, vec3(1.0/2.2));
-        
+
         FragColor = vec4(col, 1.0);
     }
     else

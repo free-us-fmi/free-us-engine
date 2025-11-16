@@ -15,13 +15,13 @@ void update()
 	std::string selected_model = model::get_selected_model();
 	content::scene::scene* _scene = content::scene::get_scene(selected_model);
 
-	if ( ImGui::Button("change_material") )
+	if ( ImGui::Button("Change material", ImVec2(-1, 0)))
 	{
 		material_popup = true;
 		material_browser::popup::initialize_and_open();
 	}
 
-	ImGui::Checkbox("transparent", &_scene->transparent);
+	ImGui::Checkbox("Transparent", &_scene->transparent);
 
 	if ( material_popup )
 	{
