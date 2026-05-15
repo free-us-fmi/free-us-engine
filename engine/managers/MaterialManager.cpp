@@ -43,7 +43,8 @@ material_id AddMaterial(const std::string& name, const std::string& uid)
 
 material* GetMaterial(material_id id)
 {
-	assert(id < materials.size());
+	if(id >= materials.size())
+		return nullptr;
 	return &materials[id];
 
 }

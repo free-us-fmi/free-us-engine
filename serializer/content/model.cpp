@@ -2,6 +2,7 @@
 #include "mesh.h"
 #include "core/serializer.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <map>
 
 namespace serializer::content::model {

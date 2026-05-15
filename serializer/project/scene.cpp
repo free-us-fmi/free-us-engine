@@ -44,7 +44,7 @@ namespace serializer::project::project_scene {
 
         writer scene_writer;
         scene_writer.open(active_scene_path.string());
-
+        
         ecs::save(scene_writer);
 
         scene_writer.flush();

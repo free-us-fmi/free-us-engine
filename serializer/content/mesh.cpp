@@ -1,7 +1,7 @@
 #include "mesh.h"
 #include "core/serializer.h"
-#include "managers/MaterialManager.h"
-#include "materials/materials.h"
+#include "engine/managers/MaterialManager.h"
+#include "engine/materials/materials.h"
 
 namespace serializer::content::mesh {
 

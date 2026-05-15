@@ -12,7 +12,7 @@
 #include "core/GLCommon.h"
 
 #include "files/file_browser.h"
-#include "assets/AssetsPath.h"
+#include "engine/assets/AssetsPath.h"
 #include "managers/TextureManager.h"
 #include "utility/EditorPath.h"
 #include "assets/assets_view.h"
@@ -27,6 +27,7 @@ namespace {
 	GLFWwindow* window;	
 }
 
+const std::string ini_path = (std::filesystem::path(::assets::GetAssetsPath()) / "imgui.ini").string();
 
 void initialize(const editor_init_data& data)
 {
@@ -39,7 +40,7 @@ void initialize(const editor_init_data& data)
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	
+	io.IniFilename = ini_path.c_str();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
