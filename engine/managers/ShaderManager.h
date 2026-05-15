@@ -1,7 +1,7 @@
 #pragma once
 #include <filesystem>
 
-#include "shaders/shader.h"
+#include "engine/shaders/shader.h"
 #include "utility/vector.h"
 #include "core/common.h"
 

@@ -1,17 +1,16 @@
-# GLtest
+# free us engine
 
-GLtest is a graphics engine that started more as a way to learn about graphics programming, but got bigger than I expected.
+Free us engine is a raymarching shader engine we built on top of GLtest, for a hackathon in Timisoara.
 
 ![Alt Text](preview.png)
 
 ## Description
 
-The engine features the ability to create a 3d scene from resources and entities with components. The types of components an entity can own are geometry, instanced geometry, and point light. The type of resources that can be created or imported are materials and models. 
+The engine features the ability to create raymarching glsl shaders and compile them at runtime.
 
-There is also the option to change the shader with which a model is loaded, but they are hard coded.
-The available additional shaders are the ones for rendering a sin wave or a klein bottle on a entity that has a light component and a plane attached to its geometry.
-A model rendered with the default or instanced shader will have shadows casted onto it.
+There are some default preview shaders(ported from shadertoy) already present in the shaders tab. In order to create new shaders, a project must be created through the 'File' menu. Every project has a '.sor' file that can be used to load it at any time.
 
+The example code for the preview shaders is located in engine/ourShaders.
 
 ## Getting Started
 
@@ -28,13 +27,25 @@ A model rendered with the default or instanced shader will have shadows casted o
 * Depending on the OS, cmake may run unsuccessfully at first and mention what missing packages it needs.
 * After the build is complete, the engine can be started directly by the IDE, or by running the executable generated inside the editor project. ( ex. editor.exe on Windows )
 
-## Author
+## Authors
 
-Marian Sorin  
-sorinmarian1000@gmail.com
+* [sorinM2](https://github.com/sorinM2)
+* [xaleamo](https://github.com/xaleamo)
+* [Alex9alexandra](https://github.com/Alex9alexandra)
+* [anarebeca](https://github.com/anaarebeca)
+* [deniisa](https://github.com/deeniisaa)
 
 ## Acknowledgments
 
+### ported preview shaders
+* [cartoon fractal](https://www.shadertoy.com/view/XsBXWt)
+* [tree fractal](https://www.shadertoy.com/view/llXfRr)
+* [mandelbulb](https://www.shadertoy.com/view/MdXSWn)
+* [mandelbrot](https://www.shadertoy.com/view/4df3Rn)
+
+* umbrella shaders were made by [xaleamo](https://github.com/xaleamo)
+
+### libraries
 * [glfw](https://github.com/glfw/glfw)
 * [glm](https://github.com/icaven/glm)
 * [assimp](https://github.com/assimp/assimp)
@@ -42,8 +53,6 @@ sorinmarian1000@gmail.com
 
 ## Mentions
 
-There is also a half working serialization system, that I didn't finish because I started working on a new engine.
+Preview shaders are ported from shadertoy.
 
-The engine started as a way to experiment with opengl, but I ended up extending it more than I expected. The application is not perfect and may crash from some specific actions, like selecting a wrong file type when importing a model.
-
-There are some 3D models and textures that I downloaded for free from the internet in engine/assets.
+Since this was made for a hackathon, and we built it on top of a existing project, there are some redundant features that don't do anything.
